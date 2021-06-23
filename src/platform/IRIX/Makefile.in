@@ -30,7 +30,8 @@ AFSLIBS=${TOP_LIBDIR}/libkauth.a \
 	${LIBDIR}/liblwp.a \
         ${TOP_LIBDIR}/libcmd.a \
 	${TOP_LIBDIR}/libafscom_err.a \
-	${TOP_LIBDIR}/util.a
+	${TOP_LIBDIR}/util.a \
+	${TOP_LIBDIR}/libopr.a
 
 KAFSLIBS=${TOP_LIBDIR}/libkauth.krb.a \
 	${TOP_LIBDIR}/libprot.a \
@@ -44,7 +45,8 @@ KAFSLIBS=${TOP_LIBDIR}/libkauth.krb.a \
 	${LIBDIR}/liblwp.a \
         ${TOP_LIBDIR}/libcmd.a \
 	${TOP_LIBDIR}/libafscom_err.a \
-	${TOP_LIBDIR}/util.a
+	${TOP_LIBDIR}/util.a \
+	${TOP_LIBDIR}/libopr.a
 
 AUTHFILES=ta-rauth.o rcmd.o herror.o
 AUTHLIBS=afsauthlib.so afskauthlib.so

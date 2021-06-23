@@ -100,7 +100,7 @@ ${TOP_LIBDIR}/libvolser.a: libvolser.a
 
 restorevol: restorevol.o
 	$(AFS_LDRULE) restorevol.o ${TOP_LIBDIR}/libcmd.a \
-		${TOP_LIBDIR}/util.a $(LIB_roken) ${XLIBS}
+		${TOP_LIBDIR}/util.a ${TOP_LIBDIR}/libopr.a $(LIB_roken) ${XLIBS}
 
 vos: vos.o libvolser.a ${LIBS}
 	$(AFS_LDRULE) vos.o libvolser.a \
