@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# Generate a ChangeLog for packages.
+#
+srcdir=${1:-.}
+ref=${2:-HEAD}
+
+if [ ! -d ${srcdir}/.git ]; then
+    echo "Warning: ${srcdir}/.git not found. ChangeLog will be empty." >&2
+else
+    git --git-dir=${srcdir}/.git --no-pager log --no-color --no-decorate "${ref}"
+fi
