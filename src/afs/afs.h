@@ -1021,7 +1021,7 @@ struct pagewriter {
 struct vcxstat {
     struct VenusFid fid;
     afs_hyper_t DataVersion;
-    afs_rwlock_t lock;
+    /* afs_rwlock_t lock; */  /* needs to be serialized */
     afs_int32 parentVnode;
     afs_int32 parentUnique;
     afs_hyper_t flushDV;

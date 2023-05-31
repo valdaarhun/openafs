@@ -94,6 +94,36 @@ struct AclEntry {
     afs_int32 rights;
 };
 
+/*
+ * Why is VenusFid declared in the kernel-only section of afs.h,
+ * if it's the exported interface of the cache manager?
+ */
+struct VenusFid {
+    afs_int32 Cell;
+    AFSFid Fid;
+};
+
+struct vcxstat {
+    struct VenusFid fid;
+    afs_hyper_t DataVersion;
+    /* afs_rwlock_t lock; */  /* needs to be serialized */
+    afs_int32 parentVnode;
+    afs_int32 parentUnique;
+    afs_hyper_t flushDV;
+    afs_hyper_t mapDV;
+    afs_int32 truncPos;
+    afs_int32 randomUid[2];
+    afs_int32 callback;	/* Now a pointer to 'server' struct */
+    afs_int32 cbExpires;
+    afs_int32 randomAccess[2];
+    afs_int32 anyAccess;
+    short opens;
+    short execsOrWriters;
+    short flockCount;
+    char mvstat;
+    afs_uint32 states;
+};
+
 struct vcxstat2 {
     afs_int32 callerAccess;
     afs_int32 cbExpires;
@@ -1530,14 +1560,6 @@ SetVolCmd(struct cmd_syndesc *as, void *arock)
     return error;
 }
 
-/*
- * Why is VenusFid declared in the kernel-only section of afs.h,
- * if it's the exported interface of the cache manager?
- */
-struct VenusFid {
-    afs_int32 Cell;
-    AFSFid Fid;
-};
 
 static int
 ExamineCmd(struct cmd_syndesc *as, void *arock)
@@ -1552,6 +1574,7 @@ ExamineCmd(struct cmd_syndesc *as, void *arock)
     SetDotDefault(&as->parms[0].items);
     for (ti = as->parms[0].items; ti; ti = ti->next) {
 	struct VenusFid vfid;
+	struct vcxstat stat;
 
 	/* once per file */
 	blob.out_size = AFS_PIOCTL_MAXSIZE;
@@ -1574,6 +1597,16 @@ ExamineCmd(struct cmd_syndesc *as, void *arock)
 		   ti->data, vfid.Fid.Volume, vfid.Fid.Vnode, vfid.Fid.Unique,
 		   vfid.Fid.Volume);
 	}
+
+	blob.out_size = sizeof(struct vcxstat);
+	blob.out = (char *) &stat;
+	code = pioctl(ti->data, VIOCGETVCXSTATUS, &blob, 1);
+	if (code != 0) {
+	    Die(errno, ti->data);
+	    error = 1;
+	    continue;
+	}
+	printf("Data version %u.%u\n", hgethi(stat.DataVersion), hgetlo(stat.DataVersion));
 
 	PrintStatus(status, name, offmsg);
     }

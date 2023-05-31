@@ -3749,8 +3749,9 @@ DECL_PIOCTL(PGetVnodeXStatus)
 
     memset(&stat, 0, sizeof(struct vcxstat));
     stat.fid = avc->f.fid;
-    hset32(stat.DataVersion, hgetlo(avc->f.m.DataVersion));
-    stat.lock = avc->lock;
+    /* hset32(stat.DataVersion, hgetlo(avc->f.m.DataVersion)); */
+    hset(stat.DataVersion, avc->f.m.DataVersion);
+    /* stat.lock = avc->lock; */  /* needs to be serialized? */
     stat.parentVnode = avc->f.parent.vnode;
     stat.parentUnique = avc->f.parent.unique;
     hset(stat.flushDV, avc->flushDV);
