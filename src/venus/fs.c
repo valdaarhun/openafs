@@ -4294,6 +4294,7 @@ GetFidCmd(struct cmd_syndesc *as, void *arock)
     }
     for (ti = as->parms[0].items; ti; ti = ti->next) {
         struct VenusFid vfid;
+	struct vcxstat stat;
 
         blob.out_size = sizeof(struct VenusFid);
         blob.out = (char *) &vfid;
@@ -4334,9 +4335,17 @@ GetFidCmd(struct cmd_syndesc *as, void *arock)
 	    continue;
         }
 
-        printf("File %s (%u.%u.%u) located in cell %s\n",
+	blob.out_size = sizeof(struct vcxstat);
+	blob.out = (char *) &stat;
+	code = pioctl(ti->data, VIOCGETVCXSTATUS, &blob, 1);
+	if (code != 0) {
+	    Die(errno, ti->data);
+	    error = 1;
+	    continue;
+	}
+        printf("File %s (fid:%u.%u.%u dv:%u.%u) located in cell %s\n",
                ti->data, vfid.Fid.Volume, vfid.Fid.Vnode, vfid.Fid.Unique,
-               cell);
+               hgethi(stat.DataVersion), hgetlo(stat.DataVersion), cell);
 
     }
 
