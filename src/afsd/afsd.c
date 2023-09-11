@@ -370,6 +370,7 @@ static void
 afsd_printf(const char *format, va_list args)
 {
     vprintf(format, args);
+    fflush(stdout);
 }
 
 static void
