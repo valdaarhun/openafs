@@ -22,6 +22,39 @@ initial style cleanup commit before making sweeping changes to a given
 file, and otherwise try to accommodate the prevailing style in the file
 when making minor changes.
 
+In prose, the indent options correspond to:
+
+* Do not read .indent.pro files
+* Do not require a blank line after function declarations
+* Require a blank line after each procedure's body
+* Do not require a newline after commas in function declarations
+* Prefer breaking long lines before boolean operators && and ||
+* Format braces with the opening brace on the same line as the condition
+* Cuddle 'else' keywords on the same line as the preceding '}'
+* Cuddle 'while' (of `do {} while ()`) keywords with preceding '}'
+* Put the opening '{' on the same line as the 'struct' keyword
+* Do not require comment delimiters ('/*' and '*/') to always be on their own
+  lines
+* Put comments after preprocessor directives at the first tab stop after the
+  directive
+* Do not use a space after a cast operator
+* Place variable declarations immediately after (with one space separator) the
+  type statement
+* For comments after declarations, do not left justify them behind the
+  declarations
+* Do not format comments in the first column as normal (i.e., allow them in
+  contexts where comments would otherwise be indented)
+* Do not format any comments (redundant with the former?)
+* Indentation is four spaces
+* Line up parentheses (on subsequent lines)
+* Do not put a space after the function name in function calls
+* Do not put a space after every '(' and before every ')'
+* Put the return type of a function on its own line
+* Use a '*' character at the left side of multiline comments
+* Do not allow optional blank lines
+* The tab stop is 8 columns
+
+
 The style for non-C code varies.  Makefiles must use literal tabs to
 indent rule bodies, but use spaces for any additional indentation
 needed.  Plain text files (such as this one) should use spaces for
