@@ -32,7 +32,7 @@ with non-gcc compilers, and can be disabled if desired. For example:
     #endif
 
 It would appear that when built with `-Werror`, the llvm clang compiler will
-still upgrade warnings that are suppresed in this way to errors. In this case,
+still upgrade warnings that are suppressed in this way to errors. In this case,
 the fix is to mark that warning as ignored, but only for clang. For example:
 
     #ifdef IGNORE_SOME_GCC_WARNINGS
@@ -110,7 +110,7 @@ If you add a new warning inhibition, also add it to the list below.
 
 * `external/heimdal/krb5/crypto.c`
   - warning: `use-after-free`
-  - reason: False postive on certain GCC compilers
+  - reason: False positive on certain GCC compilers
 
 * `kauth/admin_tools.c`
   - warning: `strict-proto`
