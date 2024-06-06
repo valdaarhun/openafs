@@ -74,7 +74,7 @@ mount it in the file space by using the B<fs mkmount> command.
 
 =head1 CAUTIONS
 
-=include fragments/volsize-caution.pod
+=include fragments/volsize-caution.pod.h
 
 =head1 OPTIONS
 
@@ -141,7 +141,7 @@ sufficient for almost all cases, so you should almost never need to
 specify them explicitly. This option is available in OpenAFS
 versions 1.5.61 or later.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

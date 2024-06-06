@@ -62,7 +62,7 @@ Specifies the new full name for the entry. For regular groups, the owner
 field (the part before the colon) of the new name must reflect the actual
 ownership of the group.
 
-=include fragments/pts-common.pod
+=include fragments/pts-common.pod.h
 
 =back
 

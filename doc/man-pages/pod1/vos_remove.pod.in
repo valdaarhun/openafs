@@ -117,7 +117,7 @@ Identifies the volume to remove, either by its complete name or volume ID
 number. If identifying a read-only or backup volume by name, include the
 appropriate extension (C<.readonly> or C<.backup>).
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

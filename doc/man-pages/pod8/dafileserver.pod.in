@@ -7,7 +7,7 @@ dafileserver - Initializes the File Server component of the dafs process
 =for html
 <div class="synopsis">
 
-=include fragments/dafileserver-synopsis.pod
+=include fragments/dafileserver-synopsis.pod.h
 
 =for html
 </div>
@@ -24,15 +24,15 @@ F</usr/afs/local/BosConfig> file with the B<bos create> command. If it is
 ever issued at the command shell prompt, the issuer must be logged onto a
 file server machine as the local superuser C<root>.
 
-=include fragments/fileserver-description.pod
+=include fragments/fileserver-description.pod.h
 
 =head1 CAUTIONS
 
-=include fragments/fileserver-cautions.pod
+=include fragments/fileserver-cautions.pod.h
 
 =head1 OPTIONS
 
-=include fragments/fileserver-options.pod
+=include fragments/fileserver-options.pod.h
 
 =item B<-fs-state-dont-save>
 
@@ -106,17 +106,17 @@ a single line:
 
 =head1 TROUBLESHOOTING
 
-=include fragments/fileserver-troubleshooting.pod
+=include fragments/fileserver-troubleshooting.pod.h
 
 =head1 PRIVILEGE REQUIRED
 
-=include fragments/fileserver-privilege.pod
+=include fragments/fileserver-privilege.pod.h
 
 =head1 SEE ALSO
 
-=include fragments/fileserver-also.pod
+=include fragments/fileserver-also.pod.h
 L<fileserver(8)>,
 
 =head1 COPYRIGHT
 
-=include fragments/fileserver-copyright.pod
+=include fragments/fileserver-copyright.pod.h

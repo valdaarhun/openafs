@@ -54,7 +54,7 @@ Prints the UUID of server entries in addition to the registered
 addresses. The B<-printuuid> option is available in OpenAFS versions 1.4.5
 or later and 1.5.8 or later.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

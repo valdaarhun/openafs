@@ -37,7 +37,7 @@ can issue the B<pts setmax> command.
 
 =over 4
 
-=include fragments/pts-common.pod
+=include fragments/pts-common.pod.h
 
 =back
 

@@ -62,7 +62,7 @@ volumes as long as the entries for the source volumes still exist. In
 a disaster recovery situation the VLDB entries for the corresponding
 source volumes need hence to be deleted first.
 
-=include fragments/volsize-caution.pod
+=include fragments/volsize-caution.pod.h
 
 =head1 OPTIONS
 
@@ -124,7 +124,7 @@ mechanism.
 Copy the changes from the source volume to a previously created shadow
 volume.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

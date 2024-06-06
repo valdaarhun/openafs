@@ -48,7 +48,7 @@ createuser> command to create a user or machine entry and does not include
 that command's B<-id> argument, the Protection Server assigns the group an
 AFS UID one greater than this value.
 
-=include fragments/pts-common.pod
+=include fragments/pts-common.pod.h
 
 =back
 

@@ -91,7 +91,7 @@ confirmation of the kill signal:
 To confirm termination of the operation, press Ctrl-C a second time; press
 any other key to continue the operation.
 
-=include fragments/volsize-caution.pod
+=include fragments/volsize-caution.pod.h
 
 =head1 OPTIONS
 
@@ -135,7 +135,7 @@ volumes to a another partition or server to free up disk space. The
 caveat is that the volume is locked during the entire operation
 instead of the short time that is needed to make the temporary clone.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

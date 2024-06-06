@@ -40,7 +40,7 @@ the volume be stored locally by the client.
 
 =head1 CAUTIONS
 
-=include fragments/volsize-caution.pod
+=include fragments/volsize-caution.pod.h
 
 =head1 OPTIONS
 
@@ -93,7 +93,7 @@ Copies the live volume without cloning.  This is normally not necessary and
 causes the volume to be kept locked for longer than the normal copy
 mechanism.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

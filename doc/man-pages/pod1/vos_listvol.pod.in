@@ -109,7 +109,7 @@ flag.
 
 Show information in a format suitable for machine parsing.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

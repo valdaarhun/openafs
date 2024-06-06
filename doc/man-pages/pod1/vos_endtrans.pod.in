@@ -71,7 +71,7 @@ Identifies which transaction to end on the Volume Server. You can get a
 listing of active transactions and their IDs from the output of
 L<B<vos status>|vos_status(1)>.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

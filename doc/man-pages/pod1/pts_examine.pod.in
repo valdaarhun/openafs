@@ -46,7 +46,7 @@ acceptable to mix users, machines, and groups on the same command line, as
 well as names (IP addresses for machines) and IDs. Precede the GID of each
 group with a hyphen to indicate that it is negative.
 
-=include fragments/pts-common.pod
+=include fragments/pts-common.pod.h
 
 =back
 

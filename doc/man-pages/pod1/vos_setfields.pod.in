@@ -71,7 +71,7 @@ will increment with time and stop updating when it reaches the maximum
 value. This option will reset it to 0. This option is available in OpenAFS
 version 1.5.0 or later.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

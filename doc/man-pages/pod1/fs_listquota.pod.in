@@ -30,7 +30,7 @@ To set volume quota, use the B<fs setquota> or B<fs setvol> command.
 
 =head1 CAUTIONS
 
-=include fragments/volsize-caution.pod
+=include fragments/volsize-caution.pod.h
 
 =head1 OPTIONS
 

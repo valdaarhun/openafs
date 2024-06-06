@@ -76,7 +76,7 @@ L<vos(1)>.
 
 Specifies the name or volume ID number on which to operate.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

@@ -51,7 +51,7 @@ Is the desired new name for the volume.
 The new name may be the same as the current volume name in the VLDB
 in order to complete a previously interrupted volume rename.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

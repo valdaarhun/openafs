@@ -131,7 +131,7 @@ counter. If there are more UIDs than entries, the excess UIDs are
 ignored. If any of the UIDs is greater than the current value of the C<max
 user id> counter, the counter is reset to that value.
 
-=include fragments/pts-common.pod
+=include fragments/pts-common.pod.h
 
 =back
 

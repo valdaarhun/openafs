@@ -197,7 +197,7 @@ Specifies the number of additional groups a user can create (it does not
 matter how many he or she has created already). Do not include this
 argument for a group or machine entry.
 
-=include fragments/pts-common.pod
+=include fragments/pts-common.pod.h
 
 =back
 

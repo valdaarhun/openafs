@@ -104,7 +104,7 @@ flag at the new site. This option is available in OpenAFS clients 1.4.7 or
 later and 1.5.31 or later. This option can be used with OpenAFS server
 versions later than 1.4.1 or 1.5.0.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

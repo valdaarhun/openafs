@@ -129,7 +129,7 @@ and L<B<vos help>|vos_help(1)>.
 
 =head1 CAUTIONS
 
-=include fragments/volsize-caution.pod
+=include fragments/volsize-caution.pod.h
 
 =head1 OPTIONS
 

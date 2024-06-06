@@ -35,7 +35,7 @@ consulted.
 
 =head1 CAUTIONS
 
-=include fragments/volsize-caution.pod
+=include fragments/volsize-caution.pod.h
 
 =head1 OPTIONS
 
@@ -60,7 +60,7 @@ L<vos(1)>.
 
 Prints storage summary.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

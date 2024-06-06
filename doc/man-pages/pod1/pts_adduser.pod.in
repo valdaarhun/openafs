@@ -52,7 +52,7 @@ Specifies the complete name (including the owner prefix if applicable) of
 each group to which to add members. The group entry must already exist in
 the Protection Database.
 
-=include fragments/pts-common.pod
+=include fragments/pts-common.pod.h
 
 =back
 

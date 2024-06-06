@@ -41,7 +41,7 @@ B<pts source> takes the following options:
 Specifies the file name to read commands from. The commands in the given file
 are run as if they were typed in pts interactive mode.
 
-=include fragments/pts-common.pod
+=include fragments/pts-common.pod.h
 
 =back
 

@@ -50,7 +50,7 @@ no one else can perform an action that requires writing the VLDB.
 Specifies either the complete name or volume ID number of a volume of any
 of the three types.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

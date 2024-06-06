@@ -79,7 +79,7 @@ argument.
 Group membership may be nested when B<ptserver> is compiled with the
 SUPERGROUPS option enabled.
 
-=include fragments/pts-common.pod
+=include fragments/pts-common.pod.h
 
 =back
 

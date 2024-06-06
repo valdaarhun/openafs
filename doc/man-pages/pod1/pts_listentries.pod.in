@@ -39,7 +39,7 @@ Displays user and machine entries.
 
 Displays group entries.
 
-=include fragments/pts-common.pod
+=include fragments/pts-common.pod.h
 
 =back
 

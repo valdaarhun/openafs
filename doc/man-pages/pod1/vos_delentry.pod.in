@@ -130,7 +130,7 @@ argument, or both.
 
 Show the actions which would be taken, but do not make changes.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

@@ -160,7 +160,7 @@ Creates a new ReleaseClone and incrementally distributes the clone volume to
 all read-only sites, regardless of the C<New release>, C<Old release>, or
 C<Not released> site flags.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

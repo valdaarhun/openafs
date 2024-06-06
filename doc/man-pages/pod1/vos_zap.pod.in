@@ -108,7 +108,7 @@ Removes the backup version of the read/write volume specified by the
 B<-id> argument. Do not use this flag if the B<-id> argument identifies a
 read-only or backup volume.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

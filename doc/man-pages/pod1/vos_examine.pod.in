@@ -47,7 +47,7 @@ display information from the VLDB only, use the B<vos listvldb> command.
 
 =head1 CAUTIONS
 
-=include fragments/volsize-caution.pod
+=include fragments/volsize-caution.pod.h
 
 =head1 OPTIONS
 
@@ -67,7 +67,7 @@ directories in the volume.
 
 Shows information in a format suitable for machine parsing.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

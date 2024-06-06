@@ -156,7 +156,7 @@ dump and not cause problems if the incremental is restored, as expected,
 on top of a volume containing the correct directory structure (such as one
 created by restoring previous full and incremental dumps).
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

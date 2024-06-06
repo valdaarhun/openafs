@@ -44,7 +44,7 @@ B<pts> options:
 
 Specifies the amount of time to sleep, in seconds.
 
-=include fragments/pts-common.pod
+=include fragments/pts-common.pod.h
 
 =back
 

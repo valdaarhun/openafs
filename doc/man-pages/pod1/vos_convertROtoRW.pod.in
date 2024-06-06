@@ -71,7 +71,7 @@ volume.
 
 Don't ask for confirmation.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

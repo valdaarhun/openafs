@@ -93,7 +93,7 @@ Overrides the multihomed server entry check when the B<-oldaddr> and
 B<-newaddr> options are combined. The B<-force> flag is provided for historical
 compatibility and is not recommended.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

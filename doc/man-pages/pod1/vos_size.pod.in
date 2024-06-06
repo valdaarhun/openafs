@@ -72,7 +72,7 @@ Specifies whether the dump is full or incremental. Omit this argument to
 size a full dump. See L<vos_dump(1)> for the valid values for this
 option.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

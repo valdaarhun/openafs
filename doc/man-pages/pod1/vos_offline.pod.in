@@ -95,7 +95,7 @@ it becomes available again.
 If B<-busy> is specified, the B<-sleep> option must also be specified, to
 indicate for how long to keep the volume busy.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

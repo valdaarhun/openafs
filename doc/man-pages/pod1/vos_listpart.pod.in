@@ -39,7 +39,7 @@ Identifies the file server machine for which to list the partitions.
 Provide the machine's IP address or its host name (either fully qualified
 or using an unambiguous abbreviation). For details, see L<vos(1)>.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

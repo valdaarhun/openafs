@@ -88,7 +88,7 @@ partition's complete name with preceding slash (for example, C</vicepa>)
 or use one of the three acceptable abbreviated forms. For details, see
 L<vos(1)>.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

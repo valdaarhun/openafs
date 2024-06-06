@@ -147,7 +147,7 @@ there are more GIDs than groups, the excess GIDs are ignored. If any of
 the GIDs is lower (more negative) than the current value of the C<max
 group id> counter, the counter is reset to that value.
 
-=include fragments/pts-common.pod
+=include fragments/pts-common.pod.h
 
 =back
 

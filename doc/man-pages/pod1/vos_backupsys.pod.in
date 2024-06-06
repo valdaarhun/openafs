@@ -178,7 +178,7 @@ B<-prefix>, B<-server>, B<-partition>, and B<-exclude> options.
 Displays on the standard output stream a list of the volumes to be cloned,
 without actually cloning them.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

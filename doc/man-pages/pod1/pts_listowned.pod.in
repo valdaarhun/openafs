@@ -43,7 +43,7 @@ negative.
 A value of 0 (zero) lists group entries for groups whose owners no longer
 have entries in the Protection Database.
 
-=include fragments/pts-common.pod
+=include fragments/pts-common.pod.h
 
 =back
 

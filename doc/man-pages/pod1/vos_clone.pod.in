@@ -63,7 +63,7 @@ B<vos move>, B<vos dump>, or other B<vos> commands.
 Some commands do not work properly on clone volumes. B<vos move> is one
 such command.
 
-=include fragments/volsize-caution.pod
+=include fragments/volsize-caution.pod.h
 
 =head1 OPTIONS
 
@@ -106,7 +106,7 @@ Flags the new volume as read-only in the volume database.
 
 Flags the new volume as read-write in the volume database.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

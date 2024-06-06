@@ -117,7 +117,7 @@ the output includes more than one volume.
 Suppresses the default sorting of volume entries alphabetically by volume
 name.
 
-=include fragments/vos-common.pod
+=include fragments/vos-common.pod.h
 
 =back
 

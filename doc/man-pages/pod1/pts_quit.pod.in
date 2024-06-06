@@ -37,7 +37,7 @@ B<pts> options:
 
 =over 4
 
-=include fragments/pts-common.pod
+=include fragments/pts-common.pod.h
 
 =back
 

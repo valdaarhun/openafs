@@ -48,7 +48,7 @@ wildcard-style) of each machine entry to remove.
 
 Names each group from which to remove members.
 
-=include fragments/pts-common.pod
+=include fragments/pts-common.pod.h
 
 =back
 

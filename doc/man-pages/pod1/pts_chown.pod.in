@@ -54,7 +54,7 @@ Specifies the current name of the group to which to assign a new owner.
 
 Names the user or group to become the group's owner.
 
-=include fragments/pts-common.pod
+=include fragments/pts-common.pod.h
 
 =back
 
