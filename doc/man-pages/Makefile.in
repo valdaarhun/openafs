@@ -6,11 +6,18 @@ include @srcdir@/Makefile.manpages
 
 all:
 
-maintclean:
-	rm -rf html man1 man3 man5 man8
+man: .man-pages
 
-html:
-	perl generate-html
+html: html/index.html
+
+.man-pages: $(POD_IN)
+	$(PERL) $(srcdir)/merge-pod
+	$(PERL) $(srcdir)/generate-man
+	touch $@
+
+html/index.html: $(POD_IN)
+	$(PERL) $(srcdir)/merge-pod
+	$(PERL) $(srcdir)/generate-html
 
 dest:
 	chmod +x install-man
@@ -59,3 +66,7 @@ install:
 	@set -e; if [ -n "@ENABLE_FUSE_CLIENT@" ] ; then \
 	    $(RUN) $(LN) -fs afsd.8 $(DESTDIR)$(mandir)/man8/afsd.fuse.8; \
 	fi
+
+clean:
+	rm -rf html man1 man3 man5 man8
+	rm -f .man-pages pod1/*.pod pod3/*.pod pod5/*.pod pod8/*.pod
