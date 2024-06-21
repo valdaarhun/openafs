@@ -581,10 +581,7 @@ J  Creating 'configure'
    To create the configure script autoconf-2.64 or later and libtool-1.9b or
    later are needed.
 
-   Running the script 'regen.sh' creates the configure script.  In addition
-   to creating the configure script, regen.sh will also, by default, build
-   the man pages, which requires the pod2man utility. Use 'regen.sh -q' to
-   skip building the man pages.
+   Running the script 'regen.sh' creates the configure script.
 
    It is possible to create the configure script on one system to be used on
    another. Ensure that the files created by 'regen.sh' are copied to the

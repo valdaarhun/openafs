@@ -4,7 +4,7 @@ srcdir=@srcdir@
 include @TOP_OBJDIR@/src/config/Makefile.config
 include @srcdir@/Makefile.manpages
 
-all:
+all: .man-pages
 
 man: .man-pages
 
@@ -29,18 +29,17 @@ install-paths.dat: Makefile
 	@echo "afssrvlibexecdir = @afssrvlibexecdir@" >>$@
 	@echo "viceetcdir = @viceetcdir@" >>$@
 
-dest:
-	chmod +x install-man
+dest: .man-pages
 	$(INSTALL) -d $(DEST)/man/man1
 	$(INSTALL) -d $(DEST)/man/man3
 	$(INSTALL) -d $(DEST)/man/man5
 	$(INSTALL) -d $(DEST)/man/man8
 	@set -e; for M in $(MAN_PAGES); do \
-	    $(RUN) ./install-man $(srcdir)/$$M $(DEST)/man/$$M ; \
+	    $(RUN) $(INSTALL_DATA) $$M $(DEST)/man/$$M ; \
 	done
 	@set -e; if [ "x@INSTALL_KAUTH@" = "xyes" ] ; then \
 	    for M in $(KAUTH_MAN); do \
-		$(RUN) ./install-man $(srcdir)/$$M $(DEST)/man/$$M ; \
+		$(RUN) $(INSTALL_DATA) $$M $(DEST)/man/$$M ; \
 	    done;
 	    $(RUN) $(LN) -fs klog.1 $(DEST)/man/man1/klog.krb.1 ; \
 	    $(RUN) $(LN) -fs pagsh.1 $(DEST)/man/man1/pagsh.krb.1 ; \
@@ -53,18 +52,17 @@ dest:
 	    $(RUN) $(LN) -fs afsd.8 $(DEST)/man/man8/afsd.fuse.8; \
 	fi
 
-install:
-	chmod +x install-man
+install: .man-pages
 	$(INSTALL) -d $(DESTDIR)$(mandir)/man1
 	$(INSTALL) -d $(DESTDIR)$(mandir)/man3
 	$(INSTALL) -d $(DESTDIR)$(mandir)/man5
 	$(INSTALL) -d $(DESTDIR)$(mandir)/man8
 	@set -e; for M in $(MAN_PAGES); do \
-	    $(RUN) ./install-man $(srcdir)/$$M $(DESTDIR)$(mandir)/$$M ; \
+	    $(RUN) $(INSTALL_DATA) $$M $(DESTDIR)$(mandir)/$$M ; \
 	done;
 	@set -e; if [ "x@INSTALL_KAUTH@" = "xyes" ] ; then \
 	    for M in $(KAUTH_MAN); do \
-	        $(RUN) ./install-man $(srcdir)/$$M $(DESTDIR)$(mandir)/$$M ; \
+	        $(RUN) $(INSTALL_DATA) $$M $(DESTDIR)$(mandir)/$$M ; \
 	    done; \
 	    $(RUN) $(LN) -fs klog.1 $(DESTDIR)$(mandir)man1/klog.krb.1 ; \
 	    $(RUN) $(LN) -fs pagsh.1 $(DESTDIR)$(mandir)/man1/pagsh.krb.1 ; \

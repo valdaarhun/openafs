@@ -102,6 +102,11 @@ close($fh);
 system ("cd $tempDir/$name && ./regen.sh") == 0
     or die $!;
 
+system ("cd $tempDir/$name/doc/man-pages && " .
+        "perl merge-pod --variable-file=transarc-paths.dat && " .
+        "perl generate-man") == 0
+    or die "Failed to generate man pages: $!";
+
 # A list of files to compress
 my @toCompress;
 

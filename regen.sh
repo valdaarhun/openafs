@@ -1,19 +1,5 @@
 #!/bin/sh -e
 
-while getopts "q" flag
-do
-    case "$flag" in
-	q)
-	    skipman=1;
-	    ;;
-	*)
-	    echo "Usage ./regen.sh [-q]"
-	    echo "	-q skips man page generation"
-	    exit
-	    ;;
-    esac
-done
-
 echo "Updating configuration..."
 
 echo "Running libtoolize"
@@ -52,16 +38,3 @@ autoheader
 
 echo "Deleting autom4te.cache directory"
 rm -rf autom4te.cache
-
-if [ $skipman ] ; then
-    echo "Skipping man page build"
-else 
-    # Rebuild the man pages, to not require those building from source to have
-    # pod2man available.
-    if test -d doc/man-pages ; then
-        echo "Building man pages"
-        perl doc/man-pages/merge-pod doc/man-pages/pod*/*.in \
-            --variable-file=doc/man-pages/transarc-paths.dat \
-        (cd doc/man-pages && ./generate-man)
-    fi
-fi

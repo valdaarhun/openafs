@@ -23,5 +23,14 @@ no)
 esac
 AC_SUBST(HAVE_DOT)
 AC_SUBST(DOT_PATH)
+
+dnl Skip man page generation when perl is missing.
+dnl Pod::Man is a core module so should be present when perl is installed.
+AC_CHECK_PROGS([PERL], [perl])
+AS_IF([test "$xPERL" = "x"],
+    [AC_MSG_WARN([Perl not found; Disabling man page generation.])
+     MAN_PAGES=""],
+    [MAN_PAGES="man-pages"])
 AC_SUBST(PERL)
+AC_SUBST(MAN_PAGES)
 ])

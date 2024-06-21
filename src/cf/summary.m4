@@ -42,6 +42,9 @@ AC_DEFUN([OPENAFS_SUMMARY],[
   AS_IF([test "x${LIB_curses}" = "x"],
     [summary_build_scout="no"],
     [summary_build_scout="yes"])
+  AS_IF([test "x${MAN_PAGES}" = "x"],
+    [summary_man_pages="no"],
+    [summary_man_pages="yes"])
   AS_IF([test "x${DOCBOOK_STYLESHEETS}" = "x"],
     [summary_docbook_stylesheets="no"],
     [summary_docbook_stylesheets="yes"])
@@ -83,6 +86,7 @@ build:
   pam                    : ${HAVE_PAM}
   login                  : ${BUILD_LOGIN}
 doc generation:
+  man pages              : ${summary_man_pages}
   docbook stylesheets    : ${summary_docbook_stylesheets}
   doxygen                : ${summary_doxygen}
   doxygen graphs         : ${summary_doxygen_graphs}
