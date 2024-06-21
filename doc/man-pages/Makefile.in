@@ -18,22 +18,22 @@ dest:
 	$(INSTALL) -d $(DEST)/man/man3
 	$(INSTALL) -d $(DEST)/man/man5
 	$(INSTALL) -d $(DEST)/man/man8
-	set -e; for M in $(MAN_PAGES); do \
-	    ./install-man $(srcdir)/$$M $(DEST)/man/$$M ; \
+	@set -e; for M in $(MAN_PAGES); do \
+	    $(RUN) ./install-man $(srcdir)/$$M $(DEST)/man/$$M ; \
 	done
-	set -e; if [ "x@INSTALL_KAUTH@" = "xyes" ] ; then \
+	@set -e; if [ "x@INSTALL_KAUTH@" = "xyes" ] ; then \
 	    for M in $(KAUTH_MAN); do \
-		./install-man $(srcdir)/$$M $(DEST)/man/$$M ; \
+		$(RUN) ./install-man $(srcdir)/$$M $(DEST)/man/$$M ; \
 	    done;
-	    $(LN) -fs klog.1 $(DEST)/man/man1/klog.krb.1 ; \
-	    $(LN) -fs pagsh.1 $(DEST)/man/man1/pagsh.krb.1 ; \
-	    $(LN) -fs tokens.1 $(DEST)/man/man1/tokens.krb.1 ; \
+	    $(RUN) $(LN) -fs klog.1 $(DEST)/man/man1/klog.krb.1 ; \
+	    $(RUN) $(LN) -fs pagsh.1 $(DEST)/man/man1/pagsh.krb.1 ; \
+	    $(RUN) $(LN) -fs tokens.1 $(DEST)/man/man1/tokens.krb.1 ; \
 	fi
-	set -e; for M in ${FSSYNCDEBUG_PAGES} ; do \
-	    $(LN) -fs $$M $(DEST)/man/man8/da$$M ; \
+	@set -e; for M in ${FSSYNCDEBUG_PAGES} ; do \
+	    $(RUN) $(LN) -fs $$M $(DEST)/man/man8/da$$M ; \
 	done
-	set -e; if [ -n "@ENABLE_FUSE_CLIENT@" ] ; then \
-	    $(LN) -fs afsd.8 $(DEST)/man/man8/afsd.fuse.8; \
+	@set -e; if [ -n "@ENABLE_FUSE_CLIENT@" ] ; then \
+	    $(RUN) $(LN) -fs afsd.8 $(DEST)/man/man8/afsd.fuse.8; \
 	fi
 
 install:
@@ -42,20 +42,20 @@ install:
 	$(INSTALL) -d $(DESTDIR)$(mandir)/man3
 	$(INSTALL) -d $(DESTDIR)$(mandir)/man5
 	$(INSTALL) -d $(DESTDIR)$(mandir)/man8
-	set -e; for M in $(MAN_PAGES); do \
-	    ./install-man $(srcdir)/$$M $(DESTDIR)$(mandir)/$$M ; \
+	@set -e; for M in $(MAN_PAGES); do \
+	    $(RUN) ./install-man $(srcdir)/$$M $(DESTDIR)$(mandir)/$$M ; \
 	done;
-	set -e; if [ "x@INSTALL_KAUTH@" = "xyes" ] ; then \
+	@set -e; if [ "x@INSTALL_KAUTH@" = "xyes" ] ; then \
 	    for M in $(KAUTH_MAN); do \
-	        ./install-man $(srcdir)/$$M $(DESTDIR)$(mandir)/$$M ; \
+	        $(RUN) ./install-man $(srcdir)/$$M $(DESTDIR)$(mandir)/$$M ; \
 	    done; \
-	    $(LN) -fs klog.1 $(DESTDIR)$(mandir)man1/klog.krb.1 ; \
-	    $(LN) -fs pagsh.1 $(DESTDIR)$(mandir)/man1/pagsh.krb.1 ; \
-	    $(LN) -fs tokens.1 $(DESTDIR)$(mandir)/man1/tokens.krb.1 ; \
+	    $(RUN) $(LN) -fs klog.1 $(DESTDIR)$(mandir)man1/klog.krb.1 ; \
+	    $(RUN) $(LN) -fs pagsh.1 $(DESTDIR)$(mandir)/man1/pagsh.krb.1 ; \
+	    $(RUN) $(LN) -fs tokens.1 $(DESTDIR)$(mandir)/man1/tokens.krb.1 ; \
 	fi
-	set -e; for M in ${FSSYNCDEBUG_PAGES} ; do \
-	    $(LN) -fs $$M $(DESTDIR)/$(mandir)/man8/da$$M ; \
+	@set -e; for M in ${FSSYNCDEBUG_PAGES} ; do \
+	    $(RUN) $(LN) -fs $$M $(DESTDIR)/$(mandir)/man8/da$$M ; \
 	done
-	set -e; if [ -n "@ENABLE_FUSE_CLIENT@" ] ; then \
-	    $(LN) -fs afsd.8 $(DESTDIR)$(mandir)/man8/afsd.fuse.8; \
+	@set -e; if [ -n "@ENABLE_FUSE_CLIENT@" ] ; then \
+	    $(RUN) $(LN) -fs afsd.8 $(DESTDIR)$(mandir)/man8/afsd.fuse.8; \
 	fi

@@ -188,6 +188,30 @@ RUNCMD=RUNCMD () { \
 	exit 0; \
 } ; RUNCMD
 
+# Wrapper for commands executed in conditionals and loops to show the command
+# being run and to show a better error message on failures. Example usage:
+#
+# Example usage:
+#
+#     mytarget:
+#         @for x in $(MYLIST); do \
+#             $(RUN) mycommand $$x; \
+#         done;
+#
+RUN=RUN () { \
+	echo "$$@"; \
+	"$$@" || failcode=$$?; \
+	if [ x"$$failcode" != x ] ; then \
+		echo >&2; \
+		echo "FAILED COMMAND: $$@" >&2; \
+		echo >&2; \
+		echo "In dir:" >&2; \
+		pwd >&2; \
+		echo >&2; \
+		exit $$failcode; \
+	fi; \
+} ; RUN
+
 RUN_CC_NOQ_V0=${RUNCMD} CC "`pwd`/$@"
 RUN_LD_NOQ_V0=${RUNCMD} LD "`pwd`/$@"
 
