@@ -27,33 +27,94 @@ require 5.00503;
 use Cwd qw(getcwd);
 use File::Basename qw(dirname basename);
 use File::Spec::Functions qw(catfile);
+use Getopt::Long;
+
+my %VARIABLE = ();
+
+# Remove leading and trailing whitespace from a string.
+sub trim {
+    my $s = shift;
+    $s =~ s/^\s+//g;
+    $s =~ s/\s+$//g;
+    return $s
+};
+
+# Load the subsititution variables from a file.
+sub load_variables {
+    my $variable_file = shift;
+    my $line = 0;
+
+    open(V, "< $variable_file") or die "Cannot open $variable_file: $!";
+    while (<V>) {
+        $line++;
+        chomp;
+        next if /^#/;     # Skip comment lines.
+        next if /^\s*$/;  # Skip blank lines.
+        unless (/=/) {
+            die "$0: Missing '=' in $variable_file line $line.\n";
+        }
+        my ($name, $value) = split(/=/, $_, 2);
+        $name = trim($name);
+        $value = trim($value);
+        $VARIABLE{$name} = $value;
+    }
+    close(V);
+}
+
+# Lookup a substitution varialble or fail with a error message.
+sub lookup_variable {
+    my $name = shift;
+    my $file = shift;
+    my $line = shift;
+
+    if (not exists $VARIABLE{$name}) {
+        die "$0: Unknown variable \@${name}\@ at $file line $line.\n";
+    }
+    return $VARIABLE{$name};
+}
+
 
 sub merge_pod {
     my ($file, $out) = @_;
     my $start = getcwd;
     my $dir = dirname ($file);
+    my $line = 1;
 
     open (FILE, "< $file") or die "cannot open $file: $!\n";
     binmode FILE, ':crlf' if $^O eq 'MSWin32';
     binmode FILE, ':crlf' if $^O eq 'cygwin';
     open (OUT, "> $out") or die "cannot open $out: $!\n";
     chdir $dir or die "cannot chdir to $dir: $!\n";
-    local $/ = '';
     local $_;
     while (<FILE>) {
         if (/^=include\s+(\S+)/) {
-            open (INCLUDE, "< $1") or die "cannot open $1: $!\n";
-            local $/;
-            print OUT <INCLUDE> or die "cannot read/write from $1: $!\n";
+            my $include_file = $1;
+            my $include_line = 1;
+            open (INCLUDE, "< $include_file") or die "cannot open $include_file: $!\n";
+            while (<INCLUDE>) {
+                s/\@(\w+)\@/lookup_variable($1, $include_file, $include_line)/age;
+                print OUT $_ or die "cannot write to $out: $!\n";
+                $include_line++;
+            }
             close INCLUDE or die "cannot read from $1: $!\n";
-            print OUT "\n" or die "cannot write to $out: $!\n";
         } else {
+            s/\@(\w+)\@/lookup_variable($1, $file, $line)/age;
             print OUT $_ or die "cannot write to $out: $!\n";
+            $line++;
         }
     }
     close OUT or die "cannot write to $out: $!\n";
     close FILE or die "cannot read from $file\n";
     chdir $start or die "cannot chdir to $start: $!\n";
+}
+
+my $variable_file;
+GetOptions(
+    "variable-file=s" => \$variable_file,
+) or die("Error while parsing options.\n");
+
+if (defined $variable_file) {
+    load_variables($variable_file);
 }
 
 if (scalar(@ARGV) > 0) {
