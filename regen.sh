@@ -60,7 +60,8 @@ else
     # pod2man available.
     if test -d doc/man-pages ; then
         echo "Building man pages"
-        perl doc/man-pages/merge-pod doc/man-pages/pod*/*.in
+        perl doc/man-pages/merge-pod doc/man-pages/pod*/*.in \
+            --variable-file=doc/man-pages/transarc-paths.dat \
         (cd doc/man-pages && ./generate-man)
     fi
 fi
