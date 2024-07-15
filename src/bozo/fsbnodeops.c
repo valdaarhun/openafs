@@ -109,8 +109,6 @@ static int RestoreSalFlag(struct fsbnode *abnode);
 static void SetNeedsClock(struct fsbnode *);
 static int NudgeProcs(struct fsbnode *);
 
-static char *PathToExecutable(char *cmd);
-
 struct bnode_ops fsbnode_ops = {
     fs_create,
     fs_timeout,
@@ -340,71 +338,6 @@ fs_delete(struct bnode *bn)
     return 0;
 }
 
-/*! PathToExecutable() - for both Unix and Windows, accept a full bnode
- * command, including any arguments, and return only the path to the
- * binary executable, with arguments stripped.
- *
- * \notes The caller will stat() the returned path.
- *
- * \param cmd - full bnode command string with arguments
- *
- * \return - string path to the binary executable, to be freed by the caller
- */
-#ifdef AFS_NT40_ENV
-/* The Windows implementation must also ensure that an extension is
- * specified in the path.
- */
-
-static char *
-PathToExecutable(char *cmd)
-{
-    char cmdext[_MAX_EXT];
-    char *cmdexe, *cmdcopy, *cmdname;
-    size_t cmdend;
-
-    cmdcopy = strdup(cmd);
-    if (cmdcopy == NULL) {
-	return NULL;
-    }
-    /* strip off any arguments */
-    cmdname = strsep(&cmdcopy, " \t");    /* roken, I'm hopin' */
-    if (*cmdname == '\0') {
-	free(cmdname);
-	return NULL;
-    }
-    /* Is there an extension specified? */
-    _splitpath(cmdname, NULL, NULL, NULL, cmdext);
-    if (*cmdext == '\0') {
-	/* No, supply one. */
-	if (asprintf(&cmdexe, "%s.exe", cmdname) < 0) {
-	    free(cmdname);
-	    return NULL;
-	}
-	free(cmdname);
-	return cmdexe;
-    }
-    return cmdname;
-}
-#else /* AFS_NT40_ENV */
-/* Unix implementation is extension-agnostic. */
-static char *
-PathToExecutable(char *cmd)
-{
-    char *cmdcopy, *cmdname;
-    cmdcopy = strdup(cmd);
-    if (cmdcopy == NULL) {
-	return NULL;
-    }
-    cmdname = strsep(&cmdcopy, " ");
-    if (*cmdname == '\0') {
-	free(cmdname);
-	return NULL;
-    }
-    return cmdname;
-}
-#endif /* AFS_NT40_ENV */
-
-
 struct bnode *
 fs_create(char *ainstance, char *afilecmd, char *avolcmd, char *asalcmd,
 	  char *ascancmd, char *dummy)
@@ -444,54 +377,20 @@ fs_create(char *ainstance, char *afilecmd, char *avolcmd, char *asalcmd,
     }
 
     if (!bailout) {
-	cmdname = PathToExecutable(fileCmdpath);
-	if (cmdname == NULL) {
-	    bozo_Log("Out of memory constructing binary filename\n");
+	if (IsExecutableOK(fileCmdpath)) {
 	    bailout = 1;
 	    goto done;
 	}
-	if (stat(cmdname, &tstat)) {
-	    bozo_Log("BNODE: file server binary '%s' not found\n", cmdname);
+	if (IsExecutableOK(volCmdpath)) {
 	    bailout = 1;
 	    goto done;
 	}
-	free(cmdname);
-
-	cmdname = PathToExecutable(volCmdpath);
-	if (cmdname == NULL) {
-	    bozo_Log("Out of memory constructing binary filename\n");
+	if (IsExecutableOK(salCmdpath)) {
 	    bailout = 1;
 	    goto done;
 	}
-	if (stat(cmdname, &tstat)) {
-	    bozo_Log("BNODE: volume server binary '%s' not found\n", cmdname);
-	    bailout = 1;
-	    goto done;
-	}
-	free(cmdname);
-
-	cmdname = PathToExecutable(salCmdpath);
-	if (cmdname == NULL) {
-	    bozo_Log("Out of memory constructing binary filename\n");
-	    bailout = 1;
-	    goto done;
-	}
-	if (stat(cmdname, &tstat)) {
-	    bozo_Log("BNODE: salvager binary '%s' not found\n", cmdname);
-	    bailout = 1;
-	    goto done;
-	}
-
 	if (ascancmd && strlen(ascancmd)) {
-	    free(cmdname);
-	    cmdname = PathToExecutable(scanCmdpath);
-	    if (cmdname == NULL) {
-		bozo_Log("Out of memory constructing binary filename\n");
-		bailout = 1;
-		goto done;
-	    }
-	    if (stat(cmdname, &tstat)) {
-		bozo_Log("BNODE: scanner binary '%s' not found\n", cmdname);
+	    if (IsExecutableOK(scanCmdpath)) {
 		bailout = 1;
 		goto done;
 	    }

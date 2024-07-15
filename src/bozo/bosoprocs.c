@@ -1367,6 +1367,92 @@ GetRequiredDirPerm(const char *path)
     return -1;
 }
 
+
+/*! PathToExecutable() - for both Unix and Windows, accept a full bnode
+ * command, including any arguments, and return only the path to the
+ * binary executable, with arguments stripped.
+ *
+ * \notes The caller will stat() the returned path.
+ *
+ * \param cmd - full bnode command string with arguments
+ *
+ * \return - string path to the binary executable, to be freed by the caller
+ */
+#ifdef AFS_NT40_ENV
+/* The Windows implementation must also ensure that an extension is
+ * specified in the path.
+ */
+
+static char *
+PathToExecutable(char *cmd)
+{
+    char cmdext[_MAX_EXT];
+    char *cmdexe, *cmdcopy, *cmdname;
+    size_t cmdend;
+
+    cmdcopy = strdup(cmd);
+    if (cmdcopy == NULL) {
+	return NULL;
+    }
+    /* strip off any arguments */
+    cmdname = strsep(&cmdcopy, " \t");    /* roken, I'm hopin' */
+    if (*cmdname == '\0') {
+	free(cmdname);
+	return NULL;
+    }
+    /* Is there an extension specified? */
+    _splitpath(cmdname, NULL, NULL, NULL, cmdext);
+    if (*cmdext == '\0') {
+	/* No, supply one. */
+	if (asprintf(&cmdexe, "%s.exe", cmdname) < 0) {
+	    free(cmdname);
+	    return NULL;
+	}
+	free(cmdname);
+	return cmdexe;
+    }
+    return cmdname;
+}
+#else /* AFS_NT40_ENV */
+/* Unix implementation is extension-agnostic. */
+static char *
+PathToExecutable(char *cmd)
+{
+    char *cmdcopy, *cmdname;
+    cmdcopy = strdup(cmd);
+    if (cmdcopy == NULL) {
+	return NULL;
+    }
+    cmdname = strsep(&cmdcopy, " ");
+    if (*cmdname == '\0') {
+	free(cmdname);
+	return NULL;
+    }
+    return cmdname;
+}
+#endif /* AFS_NT40_ENV */
+
+int
+IsExecutableOK(const char *cmdpath)
+{
+    int ok = 0;
+    const char *cmdname;
+
+    cmdname = PathToExecutable(cmdpath);
+    if (cmdname == NULL) {
+	bozo_Log("Out of memory constructing binary filename\n");
+	goto done;
+    }
+    if (stat(cmdname, &tstat)) {
+	bozo_Log("BNODE: Server binary '%s' not found\n", cmdname);
+	goto done;
+    }
+    ok = 1;
+  done:
+    free(cmdname);
+    return ok;
+}
+
 afs_int32
 SBOZO_GetInstanceInfo(IN struct rx_call *acall,
 		      IN char *ainstance,
