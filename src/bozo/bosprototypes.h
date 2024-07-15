@@ -50,6 +50,7 @@ int GetRequiredDirPerm(const char *path);
 void *bozo_ShutdownAndExit(void *arock /* really int asignal */);
 int initBosEntryStats(void);
 int DirAccessOK(void);
+int IsExecutableOK(const char *cmdpath);
 
 /* inline functions */
 static_inline struct bozo_key *
