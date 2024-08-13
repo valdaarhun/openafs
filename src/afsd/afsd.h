@@ -10,13 +10,16 @@
 #ifndef AFSD_AFSD_H
 #define AFSD_AFSD_H
 
-extern int afsd_debug;
-extern int afsd_verbose;
 extern char *afsd_cacheMountDir;
 
 void afsd_init(void);
 int afsd_parse(int argc, char **argv);
 int afsd_run(void);
+void afsd_error(const char *format, ...);
+void afsd_info(const char *format, ...);
+void afsd_verbose(const char *format, ...);
+void afsd_debug(const char *format, ...);
+int afsd_verbosity(void);
 
 /* a function that is called from afsd_fork in a new process/thread */
 typedef void* (*afsd_callback_func) (void *rock);
