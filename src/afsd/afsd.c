@@ -373,6 +373,16 @@ afsd_printf(const char *format, va_list args)
 }
 
 static void
+afsd_info(const char *format, ...)
+{
+    va_list ap;
+
+    va_start(ap, format);
+    afsd_printf(format, ap);
+    va_end(ap);
+}
+
+static void
 afsd_debug(const char *format, ...)
 {
     if (enable_debug) {
@@ -465,7 +475,7 @@ afsd_update_addresses(CFRunLoopTimerRef timer, void *info)
 	code = code | 0x40000000;
 	afsd_syscall(AFSOP_ADVISEADDR, code, addrbuf, maskbuf, mtubuf);
     } else
-	printf("ADVISEADDR: Error in specifying interface addresses:%s\n",
+	afsd_info("ADVISEADDR: Error in specifying interface addresses:%s\n",
 	       reason);
 
     /* Since it's likely this means our DNS server changed, reinit now */
@@ -595,7 +605,7 @@ ParseCacheInfoFile(void)
 
     cachefd = fopen(fullpn_CacheInfo, "r");
     if (!cachefd) {
-	printf("%s: Can't read cache info file '%s'\n", rn, fullpn_CacheInfo);
+	afsd_info("%s: Can't read cache info file '%s'\n", rn, fullpn_CacheInfo);
 	return (1);
     }
 
@@ -616,11 +626,11 @@ ParseCacheInfoFile(void)
     fclose(cachefd);
 
     if (parseResult == EOF || parseResult < 3) {
-	printf("%s: Format error in cache info file!\n", rn);
+	afsd_info("%s: Format error in cache info file!\n", rn);
 	if (parseResult == EOF)
-	    printf("\tEOF encountered before any field parsed.\n");
+	    afsd_info("\tEOF encountered before any field parsed.\n");
 	else
-	    printf("\t%d out of 3 fields successfully parsed.\n",
+	    afsd_info("\t%d out of 3 fields successfully parsed.\n",
 		   parseResult);
 
 	return (1);
@@ -706,7 +716,7 @@ PartSizeOverflow(char *path, int cs)
 
     mint = totalblks / 100 * 95;
     if (cs > mint) {
-	printf
+	afsd_info
 	    ("Cache size (%d) must be less than 95%% of partition size (which is %lld). Lower cache size\n",
 	     cs, mint);
 	return 1;
@@ -826,7 +836,7 @@ CreateCacheSubDir(char *basename, int dirNum)
     afsd_debug("%s: Creating cache subdir '%s'\n", rn, dir);
 
     if ((ret = mkdir(dir, 0700)) != 0) {
-	printf("%s: Can't create '%s', error return is %d (%d)\n", rn, dir,
+	afsd_info("%s: Can't create '%s', error return is %d (%d)\n", rn, dir,
 	       ret, errno);
 	if (errno != EEXIST)
 	    return (-1);
@@ -867,7 +877,7 @@ MoveCacheFile(char *basename, int fromDir, int toDir, int cacheFile,
 
     if (cache_dir_list[toDir] < 0
 	&& (ret = CreateCacheSubDir(basename, toDir))) {
-	printf("%s: Can't create directory '%s/D%d'\n", rn, basename, toDir);
+	afsd_info("%s: Can't create directory '%s/D%d'\n", rn, basename, toDir);
 	return ret;
     }
 
@@ -885,7 +895,7 @@ MoveCacheFile(char *basename, int fromDir, int toDir, int cacheFile,
     afsd_verbose("%s: Moving cacheFile from '%s' to '%s'\n", rn, from, to);
 
     if ((ret = rename(from, to)) != 0) {
-	printf("%s: Can't rename '%s' to '%s', error return is %d (%d)\n", rn,
+	afsd_info("%s: Can't rename '%s' to '%s', error return is %d (%d)\n", rn,
 	       from, to, ret, errno);
 	return -1;
     }
@@ -910,14 +920,14 @@ CreateCacheFile(char *fname, struct stat *statp)
     afsd_debug("%s: Creating cache file '%s'\n", rn, fname);
     cfd = open(fname, createAndTrunc, ownerRWmode);
     if (cfd <= 0) {
-	printf("%s: Can't create '%s', error return is %d (%d)\n", rn, fname,
+	afsd_info("%s: Can't create '%s', error return is %d (%d)\n", rn, fname,
 	       cfd, errno);
 	return (-1);
     }
     if (statp != NULL) {
 	closeResult = fstat(cfd, statp);
 	if (closeResult) {
-	    printf
+	    afsd_info
 		("%s: Can't stat newly-created AFS cache file '%s' (code %d)\n",
 		 rn, fname, errno);
 	    return (-1);
@@ -925,7 +935,7 @@ CreateCacheFile(char *fname, struct stat *statp)
     }
     closeResult = close(cfd);
     if (closeResult) {
-	printf
+	afsd_info
 	    ("%s: Can't close newly-created AFS cache file '%s' (code %d)\n",
 	     rn, fname, errno);
 	return (-1);
@@ -939,7 +949,7 @@ CreateFileIfMissing(char *fullpn, int missing)
 {
     if (missing) {
 	if (CreateCacheFile(fullpn, NULL))
-	    printf("CreateFileIfMissing: Can't create '%s'\n", fullpn);
+	    afsd_info("CreateFileIfMissing: Can't create '%s'\n", fullpn);
     }
 }
 
@@ -949,11 +959,11 @@ UnlinkUnwantedFile(char *rn, char *fullpn_FileToDelete, char *fileToDelete)
     if (unlink(fullpn_FileToDelete)) {
 	if ((errno == EISDIR || errno == EPERM) && *fileToDelete == 'D') {
 	    if (rmdir(fullpn_FileToDelete)) {
-		printf("%s: Can't rmdir '%s', errno is %d\n", rn,
+		afsd_info("%s: Can't rmdir '%s', errno is %d\n", rn,
 		       fullpn_FileToDelete, errno);
 	    }
 	} else
-	    printf("%s: Can't unlink '%s', errno is %d\n", rn,
+	    afsd_info("%s: Can't unlink '%s', errno is %d\n", rn,
 		   fullpn_FileToDelete, errno);
     }
 }
@@ -1009,13 +1019,13 @@ doSweepAFSCache(int *vFilesFound,
     afsd_debug("%s: Opening cache directory '%s'\n", rn, directory);
 
     if (chmod(directory, 0700)) {	/* force it to be 700 */
-	printf("%s: Can't 'chmod 0700' the cache dir, '%s'.\n", rn,
+	afsd_info("%s: Can't 'chmod 0700' the cache dir, '%s'.\n", rn,
 	       directory);
 	return (-1);
     }
     cdirp = opendir(directory);
     if (cdirp == (DIR *) 0) {
-	printf("%s: Can't open AFS cache directory, '%s'.\n", rn, directory);
+	afsd_info("%s: Can't open AFS cache directory, '%s'.\n", rn, directory);
 	return (-1);
     }
 
@@ -1076,7 +1086,7 @@ doSweepAFSCache(int *vFilesFound,
 		    /* Too many files -- add to filelist */
 		    struct afsd_file_list *tmp = malloc(sizeof(*tmp));
 		    if (!tmp)
-			printf
+			afsd_info
 			    ("%s: MALLOC FAILED allocating file_list entry\n",
 			     rn);
 		    else {
@@ -1121,7 +1131,7 @@ doSweepAFSCache(int *vFilesFound,
 		doSweepAFSCache(vFilesFound, fullpn_FileToDelete, vFileNum,
 				(retval == 1 ? 0 : -1));
 	    if (retval) {
-		printf("%s: Recursive sweep failed on directory %s\n", rn,
+		afsd_info("%s: Recursive sweep failed on directory %s\n", rn,
 		       currp->d_name);
 		return retval;
 	    }
@@ -1191,7 +1201,7 @@ doSweepAFSCache(int *vFilesFound,
 		       && cache_dir_list[thisDir] >= nFilesPerDir)
 		    thisDir++;
 		if (thisDir >= maxDir)
-		    printf("%s: can't find directory to create V%d\n", rn,
+		    afsd_info("%s: can't find directory to create V%d\n", rn,
 			   vFileNum);
 		else {
 		    struct stat statb;
@@ -1202,10 +1212,10 @@ doSweepAFSCache(int *vFilesFound,
 		    afsd_verbose("%s: Creating '%s'\n", rn, fullpn_VFile);
 		    if (cache_dir_list[thisDir] < 0
 			&& CreateCacheSubDir(directory, thisDir))
-			printf("%s: Can't create directory for '%s'\n", rn,
+			afsd_info("%s: Can't create directory for '%s'\n", rn,
 			       fullpn_VFile);
 		    if (CreateCacheFile(fullpn_VFile, &statb))
-			printf("%s: Can't create '%s'\n", rn, fullpn_VFile);
+			afsd_info("%s: Can't create '%s'\n", rn, fullpn_VFile);
 		    else {
 #if !defined(AFS_CACHE_VNODE_PATH) && !defined(AFS_LINUX_ENV)
 			inode_for_V[vFileNum] = statb.st_ino;
@@ -1226,7 +1236,7 @@ doSweepAFSCache(int *vFilesFound,
 		       && cache_dir_list[thisDir] >= nFilesPerDir)
 		    thisDir++;
 		if (thisDir >= maxDir)
-		    printf("%s: can't find directory to move V%d\n", rn,
+		    afsd_info("%s: can't find directory to move V%d\n", rn,
 			   vFileNum);
 		else {
 		    if (MoveCacheFile
@@ -1257,7 +1267,7 @@ doSweepAFSCache(int *vFilesFound,
 		       && cache_dir_list[thisDir] >= nFilesPerDir)
 		    thisDir++;
 		if (thisDir >= maxDir)
-		    printf("%s: can't find directory to move V%d\n", rn,
+		    afsd_info("%s: can't find directory to move V%d\n", rn,
 			   vFileNum);
 		else {
 		    if (MoveCacheFile
@@ -1389,7 +1399,7 @@ SweepAFSCache(int *vFilesFound)
     if (cache_dir_list == NULL) {
 	cache_dir_list = malloc(maxDir * sizeof(*cache_dir_list));
 	if (cache_dir_list == NULL) {
-	    printf("%s: Malloc Failed!\n", rn);
+	    afsd_info("%s: Malloc Failed!\n", rn);
 	    return (-1);
 	}
 	for (i = 0; i < maxDir; i++)
@@ -1399,7 +1409,7 @@ SweepAFSCache(int *vFilesFound)
     if (cache_dir_filelist == NULL) {
 	cache_dir_filelist = calloc(maxDir, sizeof(*cache_dir_filelist));
 	if (cache_dir_filelist == NULL) {
-	    printf("%s: Malloc Failed!\n", rn);
+	    afsd_info("%s: Malloc Failed!\n", rn);
 	    return (-1);
 	}
     }
@@ -1407,7 +1417,7 @@ SweepAFSCache(int *vFilesFound)
     if (dir_for_V == NULL) {
 	dir_for_V = malloc(cacheFiles * sizeof(*dir_for_V));
 	if (dir_for_V == NULL) {
-	    printf("%s: Malloc Failed!\n", rn);
+	    afsd_info("%s: Malloc Failed!\n", rn);
 	    return (-1);
 	}
 	for (i = 0; i < cacheFiles; i++)
@@ -1453,7 +1463,7 @@ ConfigCell(struct afsconf_cell *aci, void *arock, struct afsconf_dir *adir)
 			cellFlags,	/* is this the home cell? */
 			aci->linkedCell);	/* Linked cell, if any */
     if (code)
-	printf("Adding cell '%s': error %d\n", aci->name, code);
+	afsd_info("Adding cell '%s': error %d\n", aci->name, code);
     return 0;
 }
 
@@ -2064,7 +2074,7 @@ sockproxy_thread(void *a_rock)
      * need to drop the controlling TTY, etc.
      */
     if (afsd_daemon(0, 0) == -1) {
-	printf("Error starting socket proxy handler: %s\n", strerror(errno));
+	afsd_info("Error starting socket proxy handler: %s\n", strerror(errno));
 	exit(1);
     }
 
@@ -2115,7 +2125,7 @@ afsdb_thread(void *rock)
      * need to drop the controlling TTY, etc.
      */
     if (afsd_daemon(0, 0) == -1) {
-	printf("Error starting AFSDB lookup handler: %s\n",
+	afsd_info("Error starting AFSDB lookup handler: %s\n",
 	       strerror(errno));
 	exit(1);
     }
@@ -2131,7 +2141,7 @@ daemon_thread(void *rock)
      * need to drop the controlling TTY, etc.
      */
     if (afsd_daemon(0, 0) == -1) {
-	printf("Error starting background daemon: %s\n",
+	afsd_info("Error starting background daemon: %s\n",
 	       strerror(errno));
 	exit(1);
     }
@@ -2172,7 +2182,7 @@ CheckOptions(struct cmd_syndesc *as)
 
 #ifdef AFS_SGI_VNODE_GLUE
     if (afs_init_kernel_config(-1) < 0) {
-	printf("Can't determine NUMA configuration, not starting AFS.\n");
+	afsd_info("Can't determine NUMA configuration, not starting AFS.\n");
 	exit(1);
     }
 #endif
@@ -2212,7 +2222,7 @@ CheckOptions(struct cmd_syndesc *as)
     if (cmd_OptionPresent(as, OPT_rmtsys)) {
 	afsd_rmtsys = 1;
 #ifdef UKERNEL
-	printf("-rmtsys not supported for UKERNEL\n");
+	afsd_info("-rmtsys not supported for UKERNEL\n");
 	return -1;
 #endif
     }
@@ -2224,7 +2234,7 @@ CheckOptions(struct cmd_syndesc *as)
 
     if (cmd_OptionAsInt(as, OPT_chunksize, &chunkSize) == 0) {
 	if (chunkSize < 0 || chunkSize > 30) {
-	    printf
+	    afsd_info
 		("afsd:invalid chunk size (not in range 0-30), using default\n");
 	    chunkSize = 0;
 	}
@@ -2238,7 +2248,7 @@ CheckOptions(struct cmd_syndesc *as)
     if (cmd_OptionPresent(as, OPT_biods)) {
 	/* -biods */
 #ifndef	AFS_AIX32_ENV
-	printf
+	afsd_info
 	    ("afsd: [-biods] currently only enabled for aix3.x VM supported systems\n");
 #else
 	cmd_OptionAsInt(as, OPT_biods, &nBiods);
@@ -2252,7 +2262,7 @@ CheckOptions(struct cmd_syndesc *as)
     sprintf(fullpn_CacheInfo, "%s/%s", confDir, CACHEINFOFILE);
 
     if (cmd_OptionPresent(as, OPT_logfile)) {
-        printf("afsd: Ignoring obsolete -logfile flag\n");
+        afsd_info("afsd: Ignoring obsolete -logfile flag\n");
     }
 
     afsd_CloseSynch = cmd_OptionPresent(as, OPT_waitclose);
@@ -2262,10 +2272,10 @@ CheckOptions(struct cmd_syndesc *as)
 	/*
 	 * Cold shutdown is the default
 	 */
-	printf("afsd: Shutting down all afs processes and afs state\n");
+	afsd_info("afsd: Shutting down all afs processes and afs state\n");
 	code = afsd_syscall(AFSOP_SHUTDOWN, 1);		/* always AFS_COLD */
 	if (code) {
-	    printf("afsd: AFS still mounted; Not shutting down\n");
+	    afsd_info("afsd: AFS still mounted; Not shutting down\n");
 	    exit(1);
 	}
 	exit(0);
@@ -2275,7 +2285,7 @@ CheckOptions(struct cmd_syndesc *as)
     enable_process_stats = cmd_OptionPresent(as, OPT_processstats);
 
     if (cmd_OptionPresent(as, OPT_memallocsleep)) {
-	printf("afsd: -mem_alloc_sleep is deprecated -- ignored\n");
+	afsd_info("afsd: -mem_alloc_sleep is deprecated -- ignored\n");
     }
 
     enable_afsdb = cmd_OptionPresent(as, OPT_afsdb);
@@ -2284,7 +2294,7 @@ CheckOptions(struct cmd_syndesc *as)
 	int res;
         cmd_OptionAsInt(as, OPT_filesdir, &res);
 	if (res < 10 || res > (1 << 30)) {
-	    printf
+	    afsd_info
 		("afsd:invalid number of files per subdir, \"%s\". Ignored\n",
 		 as->parms[25].items->data);
 	} else {
@@ -2301,10 +2311,10 @@ CheckOptions(struct cmd_syndesc *as)
     }
     if (cmd_OptionPresent(as, OPT_settime)) {
 	/* -settime */
-	printf("afsd: -settime ignored\n");
-	printf("afsd: the OpenAFS client no longer sets the system time; "
+	afsd_info("afsd: -settime ignored\n");
+	afsd_info("afsd: the OpenAFS client no longer sets the system time; "
 	       "please use NTP or\n");
-	printf("afsd: another such system to synchronize client time\n");
+	afsd_info("afsd: another such system to synchronize client time\n");
     }
 
     enable_nomount = cmd_OptionPresent(as, OPT_nomount);
@@ -2316,10 +2326,10 @@ CheckOptions(struct cmd_syndesc *as)
 	/* -rxpck */
 	int rxpck;
         cmd_OptionAsInt(as, OPT_rxpck, &rxpck);
-	printf("afsd: set rxpck = %d\n", rxpck);
+	afsd_info("afsd: set rxpck = %d\n", rxpck);
 	code = afsd_syscall(AFSOP_SET_RXPCK, rxpck);
 	if (code) {
-	    printf("afsd: failed to set rxpck\n");
+	    afsd_info("afsd: failed to set rxpck\n");
 	    exit(1);
 	}
     }
@@ -2330,7 +2340,7 @@ CheckOptions(struct cmd_syndesc *as)
 	cmd_OptionAsString(as, OPT_splitcache, &var);
 
 	if (var == NULL || ((c = strchr(var, '/')) == NULL))
-	    printf
+	    afsd_info
 		("ignoring splitcache (specify as RW/RO percentages: 60/40)\n");
 	else {
 	    ropct = atoi(c + 1);
@@ -2347,7 +2357,7 @@ CheckOptions(struct cmd_syndesc *as)
 #ifdef AFS_MAXVCOUNT_ENV
        afsd_dynamic_vcaches = 0;
 #else
-       printf("afsd: Error toggling flag, dynamically allocated vcaches not supported on your platform\n");
+       afsd_info("afsd: Error toggling flag, dynamically allocated vcaches not supported on your platform\n");
        exit(1);
 #endif
     }
@@ -2400,14 +2410,14 @@ afsd_run(void)
      */
     cdir = afsconf_Open(confDir);
     if (!cdir) {
-	printf("afsd: some file missing or bad in %s\n", confDir);
+	afsd_info("afsd: some file missing or bad in %s\n", confDir);
 	exit(1);
     }
 
     lookupResult =
 	afsconf_GetLocalCell(cdir, LclCellName, sizeof(LclCellName));
     if (lookupResult) {
-	printf("%s: Can't get my home cell name!  [Error is %d]\n", rn,
+	afsd_info("%s: Can't get my home cell name!  [Error is %d]\n", rn,
 	       lookupResult);
     } else {
 	afsd_verbose("%s: My home cell is '%s'\n", rn, LclCellName);
@@ -2434,7 +2444,7 @@ afsd_run(void)
 		chunkSize = 13;	/* 8k default chunksize for memcache */
 	    }
 	    if (sawCacheBlocks) {
-		printf
+		afsd_info
 		    ("%s: can't set cache blocks and dcache size simultaneously when diskless.\n",
 		     rn);
 		exit(1);
@@ -2558,7 +2568,7 @@ afsd_run(void)
      */
     inode_for_V = calloc(cacheFiles, sizeof(AFSD_INO_T));
     if (inode_for_V == (AFSD_INO_T *) 0) {
-	printf
+	afsd_info
 	    ("%s: malloc() failed for cache file inode table with %d entries.\n",
 	     rn, cacheFiles);
 	exit(1);
@@ -2581,9 +2591,9 @@ afsd_run(void)
 	fsTypeMsg = CheckCacheBaseDir(cacheBaseDir);
 	if (fsTypeMsg) {
 #ifdef AFS_SUN5_ENV
-	    printf("%s: WARNING: Cache dir check failed (%s)\n", rn, fsTypeMsg);
+	    afsd_info("%s: WARNING: Cache dir check failed (%s)\n", rn, fsTypeMsg);
 #else
-	    printf("%s: ERROR: Cache dir check failed (%s)\n", rn, fsTypeMsg);
+	    afsd_info("%s: ERROR: Cache dir check failed (%s)\n", rn, fsTypeMsg);
 	    exit(1);
 #endif
 	}
@@ -2608,7 +2618,7 @@ afsd_run(void)
 	/* rand-fortuna wants at least 128 bytes of seed; be generous. */
 	unsigned char seedbuf[256];
 	if (RAND_bytes(seedbuf, sizeof(seedbuf)) != 1) {
-	    printf("SEED_ENTROPY: Error retrieving seed entropy\n");
+	    afsd_info("SEED_ENTROPY: Error retrieving seed entropy\n");
 	}
 	afsd_syscall(AFSOP_SEED_ENTROPY, seedbuf, sizeof(seedbuf));
 	memset(seedbuf, 0, sizeof(seedbuf));
@@ -2624,7 +2634,7 @@ afsd_run(void)
 		code = code | 0x80000000;
 	    afsd_syscall(AFSOP_ADVISEADDR, code, addrbuf, maskbuf, mtubuf);
 	} else
-	    printf("ADVISEADDR: Error in specifying interface addresses:%s\n",
+	    afsd_info("ADVISEADDR: Error in specifying interface addresses:%s\n",
 		   reason);
     }
 
@@ -2672,7 +2682,7 @@ afsd_run(void)
     }
     code = afsd_syscall(AFSOP_BASIC_INIT, 1);
     if (code) {
-	printf("%s: Error %d in basic initialization.\n", rn, code);
+	afsd_info("%s: Error %d in basic initialization.\n", rn, code);
         exit(1);
     }
 
@@ -2695,7 +2705,7 @@ afsd_run(void)
     cparams.dynamic_vcaches = afsd_dynamic_vcaches;
     code = afsd_syscall(AFSOP_CACHEINIT, &cparams);
     if (code) {
-	printf("%s: Error %d during cache init.\n", rn, code);
+	afsd_info("%s: Error %d during cache init.\n", rn, code);
         exit(1);
     }
 
@@ -2724,7 +2734,7 @@ afsd_run(void)
 	do {
 	    cacheIteration++;
 	    if (SweepAFSCache(&vFilesFound)) {
-		printf("%s: Error on sweep %d of workstation AFS cache \
+		afsd_info("%s: Error on sweep %d of workstation AFS cache \
                        directory.\n", rn, cacheIteration);
 		exit(1);
 	    }
@@ -2760,14 +2770,14 @@ afsd_run(void)
         afsd_verbose("%s: Setting rxmaxfrags in kernel = %d\n", rn, rxmaxfrags);
 	code = afsd_syscall(AFSOP_SET_RXMAXFRAGS, rxmaxfrags);
         if (code)
-            printf("%s: Error seting rxmaxfrags\n", rn);
+            afsd_info("%s: Error seting rxmaxfrags\n", rn);
     }
 
     if (rxmaxmtu) {
         afsd_verbose("%s: Setting rxmaxmtu in kernel = %d\n", rn, rxmaxmtu);
 	code = afsd_syscall(AFSOP_SET_RXMAXMTU, rxmaxmtu);
         if (code)
-            printf("%s: Error seting rxmaxmtu\n", rn);
+            afsd_info("%s: Error seting rxmaxmtu\n", rn);
     }
 
     if (inumcalc != NULL) {
@@ -2776,7 +2786,7 @@ afsd_run(void)
 		       rn);
 	    code = afsd_syscall(AFSOP_SET_INUMCALC, AFS_INUMCALC_COMPAT);
 	    if (code) {
-		printf("%s: Error setting inode calculation method: code=%d.\n",
+		afsd_info("%s: Error setting inode calculation method: code=%d.\n",
 		       rn, code);
 	    }
 	} else if (strcmp(inumcalc, "md5") == 0) {
@@ -2784,11 +2794,11 @@ afsd_run(void)
 		       rn);
 	    code = afsd_syscall(AFSOP_SET_INUMCALC, AFS_INUMCALC_MD5);
 	    if (code) {
-		printf("%s: Error setting inode calculation method: code=%d.\n",
+		afsd_info("%s: Error setting inode calculation method: code=%d.\n",
 		       rn, code);
 	    }
 	} else {
-	    printf("%s: Unknown value for -inumcalc: %s."
+	    afsd_info("%s: Unknown value for -inumcalc: %s."
 		   "Using default inode calculation method.\n", rn, inumcalc);
 	}
     }
@@ -2798,7 +2808,7 @@ afsd_run(void)
 		   (enable_dynroot==2)?", not showing cells.":"");
 	code = afsd_syscall(AFSOP_SET_DYNROOT, 1);
 	if (code)
-	    printf("%s: Error enabling dynroot support.\n", rn);
+	    afsd_info("%s: Error enabling dynroot support.\n", rn);
     }
 
     if (enable_fakestat) {
@@ -2807,14 +2817,14 @@ afsd_run(void)
 		   :" for crosscell mountpoints");
 	code = afsd_syscall(AFSOP_SET_FAKESTAT, enable_fakestat);
 	if (code)
-	    printf("%s: Error enabling fakestat support.\n", rn);
+	    afsd_info("%s: Error enabling fakestat support.\n", rn);
     }
 
     if (enable_backuptree) {
 	afsd_verbose("%s: Enabling backup tree support in kernel.\n", rn);
 	code = afsd_syscall(AFSOP_SET_BACKUPTREE, enable_backuptree);
 	if (code)
-	    printf("%s: Error enabling backup tree support.\n", rn);
+	    afsd_info("%s: Error enabling backup tree support.\n", rn);
     }
 
     /*
@@ -2864,16 +2874,16 @@ afsd_run(void)
 	code = afsd_syscall(AFSOP_SET_VOLUME_TTL, volume_ttl);
 	if (code == EFAULT) {
 	    if (volume_ttl < AFS_MIN_VOLUME_TTL)
-		printf("%s: Failed to set volume ttl to %d seconds; "
+		afsd_info("%s: Failed to set volume ttl to %d seconds; "
 		       "value is too low.\n", rn, volume_ttl);
 	    else if (volume_ttl > AFS_MAX_VOLUME_TTL)
-		printf("%s: Failed to set volume ttl to %d seconds; "
+		afsd_info("%s: Failed to set volume ttl to %d seconds; "
 		       "value is too high.\n", rn, volume_ttl);
 	    else
-		printf("%s: Failed to set volume ttl to %d seconds; "
+		afsd_info("%s: Failed to set volume ttl to %d seconds; "
 		       "value is out of range.\n", rn, volume_ttl);
 	} else if (code != 0) {
-	    printf("%s: Failed to set volume ttl to %d seconds; "
+	    afsd_info("%s: Failed to set volume ttl to %d seconds; "
 		   "code=%d.\n", rn, volume_ttl, code);
 	}
     }
@@ -2909,7 +2919,7 @@ afsd_run(void)
 				 rn, cacheFiles, cacheBaseDir);
 			nocachefile = 1;
 		    } else {
-			printf
+			afsd_info
 			    ("%s: Error calling AFSOP_CACHEFILE for '%s'\n",
 			     rn, fullpn_VFile);
 			exit(1);
@@ -2922,7 +2932,7 @@ afsd_run(void)
 #if defined(AFS_SGI_ENV) || !(defined(AFS_LINUX_ENV) || defined(AFS_CACHE_VNODE_PATH))
 	    afsd_syscall(AFSOP_CACHEINODE, inode_for_V[currVFile]);
 #else
-	    printf
+	    afsd_info
 		("%s: Error calling AFSOP_CACHEINODE: not configured\n",
 		 rn);
 	    exit(1);
@@ -2942,7 +2952,7 @@ afsd_run(void)
      * At this point, we have finished passing the kernel all the info
      * it needs to set up the AFS.  Mount the AFS root.
      */
-    printf("%s: All AFS daemons started.\n", rn);
+    afsd_info("%s: All AFS daemons started.\n", rn);
 
     afsd_verbose("%s: Forking trunc-cache daemon.\n", rn);
     fork_syscall(rn, AFSOP_START_TRUNCDAEMON);
@@ -2957,7 +2967,7 @@ afsd_run(void)
 	afsd_fork(0, rmtsysd_thread, NULL);
 	code = afsd_syscall(AFSOP_SET_RMTSYS_FLAG, 1);
 	if (code)
-	    printf("%s: Error enabling rmtsys support.\n", rn);
+	    afsd_info("%s: Error enabling rmtsys support.\n", rn);
     }
 #endif /* !UKERNEL */
     /*
@@ -3116,7 +3126,7 @@ call_syscall_thread(void *rock)
 
     code = afsd_call_syscall(args);
     if (code && args->syscall == AFSOP_START_CS) {
-	printf("%s: No check server daemon in client.\n", args->rn);
+	afsd_info("%s: No check server daemon in client.\n", args->rn);
     }
 
     free(args);
@@ -3217,7 +3227,7 @@ afsd_syscall_populate(struct afsd_syscall_args *args, int syscall, va_list ap)
 	params[1] = CAST_SYSCALL_PARAM((va_arg(ap, afs_uint32)));
 	break;
     default:
-	printf("Unknown syscall enountered: %d\n", syscall);
+	afsd_info("Unknown syscall enountered: %d\n", syscall);
 	opr_Assert(0);
     }
 }
