@@ -339,7 +339,7 @@ afsd_call_syscall(struct afsd_syscall_args *args)
 
     error = os_syscall(args);
 
-    if (afsd_debug) {
+    if (enable_debug) {
 	char *opcode;
 	char buffer[32];
         const char *syscall_str;
@@ -576,7 +576,7 @@ afsd_mount_afs(const char *rn, const char *cacheMountDir)
     mountFlags |= MS_DATA;
 #endif
 
-    if (afsd_verbose)
+    if (enable_verbose)
 	printf("%s: Mounting the AFS root on '%s', flags: %d.\n", rn,
 	    cacheMountDir, mountFlags);
 #if defined(AFS_FBSD_ENV)

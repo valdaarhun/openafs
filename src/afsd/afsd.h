@@ -10,8 +10,8 @@
 #ifndef AFSD_AFSD_H
 #define AFSD_AFSD_H
 
-extern int afsd_debug;
-extern int afsd_verbose;
+extern int enable_debug;
+extern int enable_verbose;
 extern char *afsd_cacheMountDir;
 
 void afsd_init(void);

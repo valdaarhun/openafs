@@ -279,8 +279,8 @@ static int enable_nomount = 0;	/* do not mount */
 static int enable_splitcache = 0;
 static char *inumcalc = NULL;        /* inode number calculation method */
 static int afsd_dynamic_vcaches = 0;	/* Enable dynamic-vcache support */
-int afsd_verbose = 0;		/*Are we being chatty? */
-int afsd_debug = 0;		/*Are we printing debugging info? */
+int enable_verbose = 0;		/*Are we being chatty? */
+int enable_debug = 0;		/*Are we printing debugging info? */
 static int afsd_CloseSynch = 0;	/*Are closes synchronous or not? */
 static int rxmaxmtu = 0;       /* Are we forcing a limit on the mtu? */
 static int rxmaxfrags = 0;      /* Are we forcing a limit on frags? */
@@ -2193,7 +2193,7 @@ CheckOptions(struct cmd_syndesc *as)
 
     cmd_OptionAsInt(as, OPT_daemons, &nDaemons);
 
-    afsd_verbose = cmd_OptionPresent(as, OPT_verbose);
+    enable_verbose = cmd_OptionPresent(as, OPT_verbose);
 
     if (cmd_OptionPresent(as, OPT_rmtsys)) {
 	afsd_rmtsys = 1;
@@ -2204,8 +2204,8 @@ CheckOptions(struct cmd_syndesc *as)
     }
 
     if (cmd_OptionPresent(as, OPT_debug)) {
-	afsd_debug = 1;
-	afsd_verbose = 1;
+	enable_debug = 1;
+	enable_verbose = 1;
     }
 
     if (cmd_OptionAsInt(as, OPT_chunksize, &chunkSize) == 0) {
