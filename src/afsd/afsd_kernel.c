@@ -339,7 +339,7 @@ afsd_call_syscall(struct afsd_syscall_args *args)
 
     error = os_syscall(args);
 
-    if (enable_debug) {
+    if (afsd_verbosity() > 1) {
 	char *opcode;
 	char buffer[32];
         const char *syscall_str;
@@ -363,13 +363,13 @@ afsd_call_syscall(struct afsd_syscall_args *args)
 
 	if (error == -1) {
 	    char *s = strerror(errno);
-	    printf("os_syscall(%s, %d, %s, 0x%lx)=%d (%d, %s)\n",
-		    syscall_str, AFSCALL_CALL, opcode,
-		   (long)args->params[0], error, errno, s);
+	    afsd_debug("os_syscall(%s, %d, %s, 0x%lx)=%d (%d, %s)\n",
+		       syscall_str, AFSCALL_CALL, opcode,
+		       (long)args->params[0], error, errno, s);
 	} else {
-	    printf("os_syscall(%s %d %s, 0x%lx)=%d\n",
-		    syscall_str, AFSCALL_CALL, opcode,
-		   (long)args->params[0], error);
+	    afsd_debug("os_syscall(%s %d %s, 0x%lx)=%d\n",
+		       syscall_str, AFSCALL_CALL, opcode,
+		       (long)args->params[0], error);
 	}
     }
 
@@ -445,7 +445,7 @@ aix_vmount(const char *cacheMountDir)
     size = sizeof(struct vmount) + ROUNDUP(strlen(cacheMountDir) + 1) + 5 * 4;
     /* Malloc and zero the vmount structure */
     if ((vmountp = calloc(1, size)) == NULL) {
-	printf("Can't allocate space for the vmount structure (AIX)\n");
+	afsd_info("Can't allocate space for the vmount structure (AIX)\n");
 	exit(1);
     }
 
@@ -485,7 +485,7 @@ HandleMTab(char *cacheMountDir)
 
     tfilep = setmntent("/etc/mtab", "a+");
     if (!tfilep) {
-	printf("Can't open /etc/mtab for writing (errno %d); not adding "
+	afsd_info("Can't open /etc/mtab for writing (errno %d); not adding "
 	       "an entry for AFS\n", errno);
 	return 1;
     }
@@ -519,7 +519,7 @@ HandleMTab(char *cacheMountDir)
     memset(&tmntent, '\0', sizeof(struct mntent));
     tfilep = setmntent(MOUNTED_TABLE, "a+");
     if (!tfilep) {
-	printf("Can't open %s for write; Not adding afs entry to it\n",
+	afsd_info("Can't open %s for write; Not adding afs entry to it\n",
 	       MOUNTED_TABLE);
 	return 1;
     }
@@ -576,8 +576,8 @@ afsd_mount_afs(const char *rn, const char *cacheMountDir)
     mountFlags |= MS_DATA;
 #endif
 
-    if (enable_verbose)
-	printf("%s: Mounting the AFS root on '%s', flags: %d.\n", rn,
+    if (afsd_verbosity() > 0)
+	afsd_verbose("%s: Mounting the AFS root on '%s', flags: %d.\n", rn,
 	    cacheMountDir, mountFlags);
 #if defined(AFS_FBSD_ENV)
     /* data must be non-const non-NULL but is otherwise ignored */
@@ -600,7 +600,7 @@ afsd_mount_afs(const char *rn, const char *cacheMountDir)
     /* This is the standard mount used by the suns and rts */
     if ((mount(MOUNT_AFS, cacheMountDir, mountFlags, (caddr_t) 0)) < 0) {
 #endif
-	printf("%s: Can't mount AFS on %s(%d)\n", rn, cacheMountDir,
+	afsd_info("%s: Can't mount AFS on %s(%d)\n", rn, cacheMountDir,
 		errno);
 	exit(1);
     }
@@ -639,13 +639,13 @@ afsd_check_mount(const char *rn, const char *mountdir)
     struct stat statbuf;
 
     if (stat(mountdir, &statbuf)) {
-	printf("%s: Mountpoint %s missing.\n", rn, mountdir);
+	afsd_info("%s: Mountpoint %s missing.\n", rn, mountdir);
 	return -1;
     } else if (!S_ISDIR(statbuf.st_mode)) {
-	printf("%s: Mountpoint %s is not a directory.\n", rn, mountdir);
+	afsd_info("%s: Mountpoint %s is not a directory.\n", rn, mountdir);
 	return -1;
     } else if (mountdir[0] != '/') {
-	printf("%s: Mountpoint %s is not an absolute path.\n", rn, mountdir);
+	afsd_info("%s: Mountpoint %s is not an absolute path.\n", rn, mountdir);
 	return -1;
     }
     return 0;

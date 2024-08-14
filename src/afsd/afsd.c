@@ -279,8 +279,8 @@ static int enable_nomount = 0;	/* do not mount */
 static int enable_splitcache = 0;
 static char *inumcalc = NULL;        /* inode number calculation method */
 static int afsd_dynamic_vcaches = 0;	/* Enable dynamic-vcache support */
-int enable_verbose = 0;		/*Are we being chatty? */
-int enable_debug = 0;		/*Are we printing debugging info? */
+static int enable_verbose = 0;		/*Are we being chatty? */
+static int enable_debug = 0;		/*Are we printing debugging info? */
 static int afsd_CloseSynch = 0;	/*Are closes synchronous or not? */
 static int rxmaxmtu = 0;       /* Are we forcing a limit on the mtu? */
 static int rxmaxfrags = 0;      /* Are we forcing a limit on frags? */
@@ -373,7 +373,19 @@ afsd_printf(const char *format, va_list args)
     fflush(stdout);
 }
 
-static void
+int
+afsd_verbosity(void)
+{
+    if (enable_debug) {
+	return 2;
+    }
+    if (enable_verbose) {
+	return 1;
+    }
+    return 0;
+}
+
+void
 afsd_info(const char *format, ...)
 {
     va_list ap;
@@ -383,7 +395,7 @@ afsd_info(const char *format, ...)
     va_end(ap);
 }
 
-static void
+void
 afsd_debug(const char *format, ...)
 {
     if (enable_debug) {
@@ -395,7 +407,8 @@ afsd_debug(const char *format, ...)
     }
 }
 
-static void
+
+void
 afsd_verbose(const char *format, ...)
 {
     if (enable_verbose) {
