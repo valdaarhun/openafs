@@ -12,7 +12,7 @@
   *	    October 1987
   *
   * Description:
-  * 	The Andrew File System startup process.  It is responsible for
+  *	The Andrew File System startup process.  It is responsible for
   * reading and parsing the various configuration files, starting up
   * the kernel processes required by AFS and feeding the configuration
   * information to the kernel.
@@ -109,35 +109,35 @@
 #endif
 
 #ifdef HAVE_SYS_FS_TYPES_H
-#include <sys/fs_types.h>
+# include <sys/fs_types.h>
 #endif
 
 #if defined(HAVE_SYS_MOUNT_H) && !defined(AFS_ARM_DARWIN_ENV)
-#include <sys/mount.h>
+# include <sys/mount.h>
 #endif
 
 #ifdef HAVE_SYS_FCNTL_H
-#include <sys/fcntl.h>
+# include <sys/fcntl.h>
 #endif
 
 #ifdef HAVE_SYS_MNTTAB_H
-#include <sys/mnttab.h>
+# include <sys/mnttab.h>
 #endif
 
 #ifdef HAVE_SYS_MNTENT_H
-#include <sys/mntent.h>
+# include <sys/mntent.h>
 #endif
 
 #ifdef HAVE_MNTENT_H
-#include <mntent.h>
+# include <mntent.h>
 #endif
 
 #ifdef HAVE_SYS_VFS_H
-#include <sys/vfs.h>
+# include <sys/vfs.h>
 #endif
 
 #ifdef HAVE_SYS_FSTYP_H
-#include <sys/fstyp.h>
+# include <sys/fstyp.h>
 #endif
 
 #include <ctype.h>
@@ -149,35 +149,35 @@
 #include <afs/sys_prototypes.h>
 
 #ifdef AFS_SGI_ENV
-#include <sched.h>
+# include <sched.h>
 #endif
 
 #ifdef AFS_DARWIN_ENV
-#ifdef AFS_DARWIN80_ENV
-#include <sys/xattr.h>
-#endif
-#include <CoreFoundation/CoreFoundation.h>
+# ifdef AFS_DARWIN80_ENV
+#  include <sys/xattr.h>
+# endif
+# include <CoreFoundation/CoreFoundation.h>
 
 static int event_pid;
-#if !defined(AFS_ARM_DARWIN_ENV) && !defined(AFS_ARM64_DARWIN_ENV)
-# define MACOS_EVENT_HANDLING 1
-#endif
+# if !defined(AFS_ARM_DARWIN_ENV) && !defined(AFS_ARM64_DARWIN_ENV)
+#  define MACOS_EVENT_HANDLING 1
+# endif
 #endif /* AFS_DARWIN_ENV */
 
 #if AFS_HAVE_STATVFS || defined(HAVE_SYS_STATVFS_H)
-#include <sys/statvfs.h>
+# include <sys/statvfs.h>
 #else
-#if defined(AFS_SUN_ENV)
-#include <sys/vfs.h>
-#else
-#ifdef HAVE_SYS_STATFS_H
-#include <sys/statfs.h>
-#endif
-#endif
+# if defined(AFS_SUN_ENV)
+#  include <sys/vfs.h>
+# else
+#  ifdef HAVE_SYS_STATFS_H
+#   include <sys/statfs.h>
+#  endif
+# endif
 #endif
 
-#undef	VIRTUE
-#undef	VICE
+#undef VIRTUE
+#undef VICE
 
 #ifdef AFS_SOCKPROXY_ENV
 # include <sys/types.h>
@@ -185,9 +185,9 @@ static int event_pid;
 #endif
 
 #define CACHEINFOFILE   "cacheinfo"
-#define	DCACHEFILE	"CacheItems"
-#define	VOLINFOFILE	"VolumeItems"
-#define CELLINFOFILE	"CellItems"
+#define DCACHEFILE      "CacheItems"
+#define VOLINFOFILE     "VolumeItems"
+#define CELLINFOFILE    "CellItems"
 
 #define MAXIPADDRS 1024
 
@@ -212,30 +212,30 @@ struct in_addr_42 {
     } S_un;
 };
 
-#define	mPrintIPAddr(ipaddr)  printf("[%d.%d.%d.%d] ",		\
-      ((struct in_addr_42 *) &(ipaddr))->S_un.S_un_b.s_b1,	\
-      ((struct in_addr_42 *) &(ipaddr))->S_un.S_un_b.s_b2,	\
-      ((struct in_addr_42 *) &(ipaddr))->S_un.S_un_b.s_b3,	\
+#define mPrintIPAddr(ipaddr)  printf("[%d.%d.%d.%d] ",     \
+      ((struct in_addr_42 *) &(ipaddr))->S_un.S_un_b.s_b1, \
+      ((struct in_addr_42 *) &(ipaddr))->S_un.S_un_b.s_b2, \
+      ((struct in_addr_42 *) &(ipaddr))->S_un.S_un_b.s_b3, \
       ((struct in_addr_42 *) &(ipaddr))->S_un.S_un_b.s_b4)
 
 /*
  * Global configuration variables.
  */
 static int enable_rxbind = 0;
-static int cacheBlocks;		/*Num blocks in the cache */
-static int cacheFiles;		/*Optimal # of files in workstation cache */
+static int cacheBlocks; /* Num blocks in the cache */
+static int cacheFiles; /* Optimal # of files in workstation cache */
 static int rwpct = 0;
 static int ropct = 0;
-static int cacheStatEntries;	/*Number of stat cache entries */
-static char *cacheBaseDir;	/*Where the workstation AFS cache lives */
-static char *confDir;		/*Where the workstation AFS configuration lives */
-static char fullpn_DCacheFile[1024];	/*Full pathname of DCACHEFILE */
-static char fullpn_VolInfoFile[1024];	/*Full pathname of VOLINFOFILE */
-static char fullpn_CellInfoFile[1024];	/*Full pathanem of CELLINFOFILE */
-static char fullpn_CacheInfo[1024];	/*Full pathname of CACHEINFO */
-static char fullpn_VFile[1024];	/*Full pathname of data cache files */
-static char *vFilePtr;			/*Ptr to the number part of above pathname */
-static int sawCacheMountDir = 0;	/* from cmd line */
+static int cacheStatEntries; /* Number of stat cache entries */
+static char *cacheBaseDir; /* Where the workstation AFS cache lives */
+static char *confDir; /* Where the workstation AFS configuration lives */
+static char fullpn_DCacheFile[1024]; /* Full pathname of DCACHEFILE */
+static char fullpn_VolInfoFile[1024]; /* Full pathname of VOLINFOFILE */
+static char fullpn_CellInfoFile[1024]; /* Full pathanem of CELLINFOFILE */
+static char fullpn_CacheInfo[1024]; /* Full pathname of CACHEINFO */
+static char fullpn_VFile[1024]; /* Full pathname of data cache files */
+static char *vFilePtr; /* Ptr to the number part of above pathname */
+static int sawCacheMountDir = 0; /* from cmd line */
 static int sawCacheBaseDir = 0;
 static int sawCacheBlocks = 0;
 static int sawDCacheSize = 0;
@@ -246,71 +246,72 @@ static int sawCacheStatEntries = 0;
 char *afsd_cacheMountDir;
 static char *rootVolume = NULL;
 #ifdef AFS_XBSD_ENV
-static int createAndTrunc = O_RDWR | O_CREAT | O_TRUNC;	/*Create & truncate on open */
+static int createAndTrunc = O_RDWR | O_CREAT | O_TRUNC; /*Create & truncate on open */
 #else
-static int createAndTrunc = O_CREAT | O_TRUNC;	/*Create & truncate on open */
+static int createAndTrunc = O_CREAT | O_TRUNC; /*Create & truncate on open */
 #endif
-static int ownerRWmode = 0600;		/*Read/write OK by owner */
-static int filesSet = 0;	/*True if number of files explicitly set */
-static int nFilesPerDir = 2048;	/* # files per cache dir */
+static int ownerRWmode = 0600; /* Read/write OK by owner */
+static int filesSet = 0; /* True if number of files explicitly set */
+static int nFilesPerDir = 2048; /* # files per cache dir */
 #if defined(AFS_CACHE_BYPASS)
-#define AFSD_NDAEMONS 4
+# define AFSD_NDAEMONS 4
 #else
-#define AFSD_NDAEMONS 2
+# define AFSD_NDAEMONS 2
 #endif
-static int nDaemons = AFSD_NDAEMONS;	/* Number of background daemons */
-static int chunkSize = 0;	/* 2^chunkSize bytes per chunk */
-static int dCacheSize;		/* # of dcache entries */
-static int vCacheSize = 200;	/* # of volume cache entries */
-static int rootVolSet = 0;	/*True if root volume name explicitly set */
-int addrNum;			/*Cell server address index being printed */
-static int cacheFlags = 0;	/*Flags to cache manager */
+static int nDaemons = AFSD_NDAEMONS;  /* Number of background daemons */
+static int chunkSize = 0;  /* 2^chunkSize bytes per chunk */
+static int dCacheSize;  /* Number of dcache entries */
+static int vCacheSize = 200;  /* Number of volume cache entries */
+static int rootVolSet = 0;  /* True if root volume name explicitly set */
+int addrNum;  /* Cell server address index being printed */
+static int cacheFlags = 0;  /* Flags to cache manager */
 #ifdef AFS_AIX32_ENV
-static int nBiods = 5;		/* AIX3.1 only */
+static int nBiods = 5;  /* AIX3.1 only */
 #endif
-static int preallocs = 400;	/* Def # of allocated memory blocks */
-static int enable_peer_stats = 0;	/* enable rx stats */
-static int enable_process_stats = 0;	/* enable rx stats */
-static int enable_afsdb = 0;	/* enable AFSDB support */
-static int enable_dynroot = 0;	/* enable dynroot support */
-static int enable_fakestat = 0;	/* enable fakestat support */
-static int enable_backuptree = 0;	/* enable backup tree support */
-static int enable_nomount = 0;	/* do not mount */
+static int preallocs = 400;  /* Def # of allocated memory blocks */
+static int enable_peer_stats = 0;  /* enable rx stats */
+static int enable_process_stats = 0;  /* enable rx stats */
+static int enable_afsdb = 0;  /* enable AFSDB support */
+static int enable_dynroot = 0;  /* enable dynroot support */
+static int enable_fakestat = 0;  /* enable fakestat support */
+static int enable_backuptree = 0;  /* enable backup tree support */
+static int enable_nomount = 0;  /* do not mount */
 static int enable_splitcache = 0;
-static char *inumcalc = NULL;        /* inode number calculation method */
-static int afsd_dynamic_vcaches = 0;	/* Enable dynamic-vcache support */
-int afsd_verbose = 0;		/*Are we being chatty? */
-int afsd_debug = 0;		/*Are we printing debugging info? */
-static int afsd_CloseSynch = 0;	/*Are closes synchronous or not? */
-static int rxmaxmtu = 0;       /* Are we forcing a limit on the mtu? */
-static int rxmaxfrags = 0;      /* Are we forcing a limit on frags? */
-static int volume_ttl = 0;      /* enable vldb cache timeout support */
+static char *inumcalc = NULL;  /* inode number calculation method */
+static int afsd_dynamic_vcaches = 0;  /* Enable dynamic-vcache support */
+int afsd_verbose = 0;  /* Are we being chatty? */
+int afsd_debug = 0;  /* Are we printing debugging info? */
+static int afsd_CloseSynch = 0;  /*Are closes synchronous or not? */
+static int rxmaxmtu = 0;  /* Are we forcing a limit on the mtu? */
+static int rxmaxfrags = 0;  /* Are we forcing a limit on frags? */
+static int volume_ttl = 0;  /* enable vldb cache timeout support */
 
 #ifdef AFS_SGI_ENV
-#define AFSD_INO_T ino64_t
+# define AFSD_INO_T ino64_t
 #else
-#define AFSD_INO_T afs_uint32
+# define AFSD_INO_T afs_uint32
 #endif
 struct afsd_file_list {
     int fileNum;
     struct afsd_file_list *next;
 };
 struct afsd_file_list **cache_dir_filelist = NULL;
-int *cache_dir_list = NULL;	/* Array of cache subdirs */
-int *dir_for_V = NULL;		/* Array: dir of each cache file.
-				 * -1: file does not exist
-				 * -2: file exists in top-level
-				 * >=0: file exists in Dxxx
-				 */
+int *cache_dir_list = NULL;  /* Array of cache subdirs */
+/*
+ * Array: dir of each cache file.
+ * -1: file does not exist
+ * -2: file exists in top-level
+ * >=0: file exists in Dxxx
+ */
+int *dir_for_V = NULL;
 #if !defined(AFS_CACHE_VNODE_PATH) && !defined(AFS_LINUX_ENV)
-AFSD_INO_T *inode_for_V;	/* Array of inodes for desired
-				 * cache files */
+AFSD_INO_T *inode_for_V;  /* Array of inodes for desired cache files */
 #endif
-int missing_DCacheFile = 1;	/*Is the DCACHEFILE missing? */
-int missing_VolInfoFile = 1;	/*Is the VOLINFOFILE missing? */
-int missing_CellInfoFile = 1;	/*Is the CELLINFOFILE missing? */
-int afsd_rmtsys = 0;		/* Default: don't support rmtsys */
-struct afs_cacheParams cparams;	/* params passed to cache manager */
+int missing_DCacheFile = 1; /* Is the DCACHEFILE missing? */
+int missing_VolInfoFile = 1; /* Is the VOLINFOFILE missing? */
+int missing_CellInfoFile = 1; /* Is the CELLINFOFILE missing? */
+int afsd_rmtsys = 0;  /* Default: don't support rmtsys */
+struct afs_cacheParams cparams; /* params passed to cache manager */
 
 int PartSizeOverflow(char *path, int cs);
 
@@ -968,7 +969,7 @@ UnlinkUnwantedFile(char *rn, char *fullpn_FileToDelete, char *fileToDelete)
 
 static int
 doSweepAFSCache(int *vFilesFound,
-     	        char *directory,	/* /path/to/cache/directory */
+		char *directory,	/* /path/to/cache/directory */
 		int dirNum,		/* current directory number */
 		int maxDir)		/* maximum directory number */
 {
@@ -1559,74 +1560,74 @@ BkgHandler(void)
 
 # ifdef AFS_DARWIN_ENV
 	case AFS_USPC_UMV:
-            {
-                pid_t child = 0;
-                int status;
-                char srcpath[BUFSIZ];
-                char dstpath[BUFSIZ];
-                snprintf(srcpath, BUFSIZ, "/afs/.:mount/%d:%d:%d:%d/%s",
-                         uspc->req.umv.sCell, uspc->req.umv.sVolume,
-                         uspc->req.umv.sVnode, uspc->req.umv.sUnique, srcName);
-                snprintf(dstpath, BUFSIZ, "/afs/.:mount/%d:%d:%d:%d/%s",
-                         uspc->req.umv.dCell, uspc->req.umv.dVolume,
-                         uspc->req.umv.dVnode, uspc->req.umv.dUnique, dstName);
-                if ((child = fork()) == 0) {
-                    /* first child does cp; second, rm. mv would re-enter. */
+	    {
+		pid_t child = 0;
+		int status;
+		char srcpath[BUFSIZ];
+		char dstpath[BUFSIZ];
+		snprintf(srcpath, BUFSIZ, "/afs/.:mount/%d:%d:%d:%d/%s",
+			 uspc->req.umv.sCell, uspc->req.umv.sVolume,
+			 uspc->req.umv.sVnode, uspc->req.umv.sUnique, srcName);
+		snprintf(dstpath, BUFSIZ, "/afs/.:mount/%d:%d:%d:%d/%s",
+			 uspc->req.umv.dCell, uspc->req.umv.dVolume,
+			 uspc->req.umv.dVnode, uspc->req.umv.dUnique, dstName);
+		if ((child = fork()) == 0) {
+		    /* first child does cp; second, rm. mv would re-enter. */
 
-                    switch (uspc->req.umv.idtype) {
-                    case IDTYPE_UID:
-                        if (setuid(uspc->req.umv.id) != 0) {
-                            exit(-1);
-                        }
-                        break;
-                    default:
-                        exit(-1);
-                        break; /* notreached */
-                    }
-                    execl("/bin/cp", "(afsd EXDEV helper)", "-PRp", "--", srcpath,
-                          dstpath, (char *) NULL);
-                }
-                if (child == (pid_t) -1) {
-                    uspc->retval = -1;
-                    continue;
-                }
+		    switch (uspc->req.umv.idtype) {
+		    case IDTYPE_UID:
+			if (setuid(uspc->req.umv.id) != 0) {
+			    exit(-1);
+			}
+			break;
+		    default:
+			exit(-1);
+			break; /* notreached */
+		    }
+		    execl("/bin/cp", "(afsd EXDEV helper)", "-PRp", "--", srcpath,
+			  dstpath, (char *) NULL);
+		}
+		if (child == (pid_t) -1) {
+		    uspc->retval = -1;
+		    continue;
+		}
 
-                if (waitpid(child, &status, 0) == -1)
-                    uspc->retval = EIO;
-                else if (WIFEXITED(status) != 0 && WEXITSTATUS(status) == 0) {
-                    if ((child = fork()) == 0) {
-                        switch (uspc->req.umv.idtype) {
-                        case IDTYPE_UID:
-                            if (setuid(uspc->req.umv.id) != 0) {
-                                exit(-1);
-                            }
-                            break;
-                        default:
-                            exit(-1);
-                            break; /* notreached */
-                        }
-                        execl("/bin/rm", "(afsd EXDEV helper)", "-rf", "--",
-                              srcpath, (char *) NULL);
-                    }
-                    if (child == (pid_t) -1) {
-                        uspc->retval = -1;
-                        continue;
-                    }
-                    if (waitpid(child, &status, 0) == -1)
-                        uspc->retval = EIO;
-                    else if (WIFEXITED(status) != 0) {
-                        /* rm exit status */
-                        uspc->retval = WEXITSTATUS(status);
-                    } else {
-                        /* rm signal status */
-                        uspc->retval = -(WTERMSIG(status));
-                    }
-                } else {
-                    /* error from cp: exit or signal status */
-                    uspc->retval = (WIFEXITED(status) != 0) ?
-                        WEXITSTATUS(status) : -(WTERMSIG(status));
-                }
-            }
+		if (waitpid(child, &status, 0) == -1)
+		    uspc->retval = EIO;
+		else if (WIFEXITED(status) != 0 && WEXITSTATUS(status) == 0) {
+		    if ((child = fork()) == 0) {
+			switch (uspc->req.umv.idtype) {
+			case IDTYPE_UID:
+			    if (setuid(uspc->req.umv.id) != 0) {
+				exit(-1);
+			    }
+			    break;
+			default:
+			    exit(-1);
+			    break; /* notreached */
+			}
+			execl("/bin/rm", "(afsd EXDEV helper)", "-rf", "--",
+			      srcpath, (char *) NULL);
+		    }
+		    if (child == (pid_t) -1) {
+			uspc->retval = -1;
+			continue;
+		    }
+		    if (waitpid(child, &status, 0) == -1)
+			uspc->retval = EIO;
+		    else if (WIFEXITED(status) != 0) {
+			/* rm exit status */
+			uspc->retval = WEXITSTATUS(status);
+		    } else {
+			/* rm signal status */
+			uspc->retval = -(WTERMSIG(status));
+		    }
+		} else {
+		    /* error from cp: exit or signal status */
+		    uspc->retval = (WIFEXITED(status) != 0) ?
+			WEXITSTATUS(status) : -(WTERMSIG(status));
+		}
+	    }
 	    memset(srcName, 0, sizeof(srcName));
 	    memset(dstName, 0, sizeof(dstName));
 	    break;
@@ -1643,15 +1644,15 @@ BkgHandler(void)
 
 #ifdef AFS_SOCKPROXY_ENV
 
-# define AFS_SOCKPROXY_RECV_IDX	0
-# define AFS_SOCKPROXY_INIT_IDX	1
+# define AFS_SOCKPROXY_RECV_IDX 0
+# define AFS_SOCKPROXY_INIT_IDX 1
 
 /*
  * Must be less than or equal to the limits supported by libafs:
  * AFS_SOCKPROXY_PKT_MAX and AFS_SOCKPROXY_PAYLOAD_MAX.
  */
-# define AFS_SOCKPROXY_PKT_ALLOC	32
-# define AFS_SOCKPROXY_PAYLOAD_ALLOC	2832
+# define AFS_SOCKPROXY_PKT_ALLOC 32
+# define AFS_SOCKPROXY_PAYLOAD_ALLOC 2832
 
 /**
  * Create socket, set send and receive buffer size, and bind a name to it.
@@ -2092,7 +2093,7 @@ sockproxy_thread(void *a_rock)
 
     return NULL;
 }
-#endif	/* AFS_SOCKPROXY_ENV */
+#endif /* AFS_SOCKPROXY_ENV */
 
 static void *
 afsdb_thread(void *rock)
@@ -2238,7 +2239,7 @@ CheckOptions(struct cmd_syndesc *as)
     sprintf(fullpn_CacheInfo, "%s/%s", confDir, CACHEINFOFILE);
 
     if (cmd_OptionPresent(as, OPT_logfile)) {
-        printf("afsd: Ignoring obsolete -logfile flag\n");
+	printf("afsd: Ignoring obsolete -logfile flag\n");
     }
 
     afsd_CloseSynch = cmd_OptionPresent(as, OPT_waitclose);
@@ -2268,7 +2269,7 @@ CheckOptions(struct cmd_syndesc *as)
     if (cmd_OptionPresent(as, OPT_filesdir)) {
 	/* -files_per_subdir */
 	int res;
-        cmd_OptionAsInt(as, OPT_filesdir, &res);
+	cmd_OptionAsInt(as, OPT_filesdir, &res);
 	if (res < 10 || res > (1 << 30)) {
 	    printf
 		("afsd:invalid number of files per subdir, \"%s\". Ignored\n",
@@ -2301,7 +2302,7 @@ CheckOptions(struct cmd_syndesc *as)
     if (cmd_OptionPresent(as, OPT_rxpck)) {
 	/* -rxpck */
 	int rxpck;
-        cmd_OptionAsInt(as, OPT_rxpck, &rxpck);
+	cmd_OptionAsInt(as, OPT_rxpck, &rxpck);
 	printf("afsd: set rxpck = %d\n", rxpck);
 	code = afsd_syscall(AFSOP_SET_RXPCK, rxpck);
 	if (code) {
@@ -2331,20 +2332,20 @@ CheckOptions(struct cmd_syndesc *as)
     }
     if (cmd_OptionPresent(as, OPT_nodynvcache)) {
 #ifdef AFS_MAXVCOUNT_ENV
-       afsd_dynamic_vcaches = 0;
+	afsd_dynamic_vcaches = 0;
 #else
-       printf("afsd: Error toggling flag, dynamically allocated vcaches not supported on your platform\n");
-       exit(1);
+	printf("afsd: Error toggling flag, dynamically allocated vcaches not supported on your platform\n");
+	exit(1);
 #endif
     }
 #ifdef AFS_MAXVCOUNT_ENV
     else {
-       /* -dynamic-vcaches */
-       afsd_dynamic_vcaches = 1;
+	/* -dynamic-vcaches */
+	afsd_dynamic_vcaches = 1;
     }
 
     if (afsd_verbose)
-    printf("afsd: %s dynamically allocated vcaches\n", ( afsd_dynamic_vcaches ? "enabling" : "disabling" ));
+	printf("afsd: %s dynamically allocated vcaches\n", ( afsd_dynamic_vcaches ? "enabling" : "disabling" ));
 #endif
 
     cmd_OptionAsInt(as, OPT_rxmaxmtu, &rxmaxmtu);
@@ -2380,7 +2381,7 @@ afsd_run(void)
     int vFilesFound;		/*How many data cache files were found in sweep */
     int currVFile;		/*Current AFS cache file number passed in */
 
-	/*
+    /*
      * Pull out all the configuration info for the workstation's AFS cache and
      * the cellular community we're willing to let our users see.
      */
@@ -2496,8 +2497,8 @@ afsd_run(void)
 	     * CacheItems is 50 Bytes / file (== 1K/20)
 	     */
 #define CACHEITMSZ (cacheFiles / 20)
-#define VOLINFOSZ 50		/* 40kB has been seen, be conservative */
-#define CELLINFOSZ 4		/* Assuming disk block size is 4k ... */
+#define VOLINFOSZ 50  /* 40kB has been seen, be conservative */
+#define CELLINFOSZ 4  /* Assuming disk block size is 4k ... */
 #define INFOSZ (VOLINFOSZ+CELLINFOSZ+CACHEITMSZ)
 
 	    /* Sanity check: If the obtained number of disk cache files
@@ -2636,17 +2637,17 @@ afsd_run(void)
 	printf("%s: Forking rx listener daemon.\n", rn);
 # ifdef AFS_SUN510_ENV
     fork_rx_syscall_wait(rn, AFSOP_RXLISTENER_DAEMON, preallocs,
-                         enable_peer_stats, enable_process_stats);
+			 enable_peer_stats, enable_process_stats);
 # else /* !AFS_SUN510_ENV */
     fork_rx_syscall(rn, AFSOP_RXLISTENER_DAEMON, preallocs, enable_peer_stats,
-                    enable_process_stats);
+		    enable_process_stats);
 # endif /* !AFS_SUN510_ENV */
 #endif
     if (afsd_verbose)
 	printf("%s: Forking rx callback listener.\n", rn);
 #ifndef RXK_LISTENER_ENV
     fork_rx_syscall(rn, AFSOP_START_RXCALLBACK, preallocs, enable_peer_stats,
-                    enable_process_stats);
+		    enable_process_stats);
 #else
     fork_syscall(rn, AFSOP_START_RXCALLBACK, preallocs, 0, 0);
 #endif
@@ -2670,7 +2671,7 @@ afsd_run(void)
     code = afsd_syscall(AFSOP_BASIC_INIT, 1);
     if (code) {
 	printf("%s: Error %d in basic initialization.\n", rn, code);
-        exit(1);
+	exit(1);
     }
 
     /*
@@ -2694,7 +2695,7 @@ afsd_run(void)
     code = afsd_syscall(AFSOP_CACHEINIT, &cparams);
     if (code) {
 	printf("%s: Error %d during cache init.\n", rn, code);
-        exit(1);
+	exit(1);
     }
 
     /* do it before we init the cache inodes */
@@ -2760,18 +2761,18 @@ afsd_run(void)
 
     if (rxmaxfrags) {
 	if (afsd_verbose)
-            printf("%s: Setting rxmaxfrags in kernel = %d\n", rn, rxmaxfrags);
+	    printf("%s: Setting rxmaxfrags in kernel = %d\n", rn, rxmaxfrags);
 	code = afsd_syscall(AFSOP_SET_RXMAXFRAGS, rxmaxfrags);
-        if (code)
-            printf("%s: Error seting rxmaxfrags\n", rn);
+	if (code)
+	    printf("%s: Error seting rxmaxfrags\n", rn);
     }
 
     if (rxmaxmtu) {
 	if (afsd_verbose)
-            printf("%s: Setting rxmaxmtu in kernel = %d\n", rn, rxmaxmtu);
+	    printf("%s: Setting rxmaxmtu in kernel = %d\n", rn, rxmaxmtu);
 	code = afsd_syscall(AFSOP_SET_RXMAXMTU, rxmaxmtu);
-        if (code)
-            printf("%s: Error seting rxmaxmtu\n", rn);
+	if (code)
+	    printf("%s: Error seting rxmaxmtu\n", rn);
     }
 
     if (inumcalc != NULL) {
@@ -2913,8 +2914,8 @@ afsd_run(void)
 	int nocachefile = 0;
 	if (afsd_debug)
 	    printf
-	        ("%s: Calling AFSOP_CACHEFILE for each of the %d files in '%s'\n",
-	         rn, cacheFiles, cacheBaseDir);
+		("%s: Calling AFSOP_CACHEFILE for each of the %d files in '%s'\n",
+		 rn, cacheFiles, cacheBaseDir);
 	/* ... and again ... */
 	for (currVFile = 0; currVFile < cacheFiles; currVFile++) {
 	    if (!nocachefile) {
@@ -3001,72 +3002,72 @@ afsd_init(void)
 
     /* 0 - 10 */
     cmd_AddParmAtOffset(ts, OPT_blocks, "-blocks", CMD_SINGLE,
-		        CMD_OPTIONAL, "1024 byte blocks in cache");
+			CMD_OPTIONAL, "1024 byte blocks in cache");
     cmd_AddParmAtOffset(ts, OPT_files, "-files", CMD_SINGLE,
-		        CMD_OPTIONAL, "files in cache");
+			CMD_OPTIONAL, "files in cache");
     cmd_AddParmAtOffset(ts, OPT_rootvol, "-rootvol", CMD_SINGLE,
-		        CMD_OPTIONAL, "name of AFS root volume");
+			CMD_OPTIONAL, "name of AFS root volume");
     cmd_AddParmAtOffset(ts, OPT_stat, "-stat", CMD_SINGLE,
-		        CMD_OPTIONAL, "number of stat entries");
+			CMD_OPTIONAL, "number of stat entries");
     cmd_AddParmAtOffset(ts, OPT_memcache, "-memcache", CMD_FLAG,
-		        CMD_OPTIONAL, "run diskless");
+			CMD_OPTIONAL, "run diskless");
     cmd_AddParmAtOffset(ts, OPT_cachedir, "-cachedir", CMD_SINGLE,
-		        CMD_OPTIONAL, "cache directory");
+			CMD_OPTIONAL, "cache directory");
     cmd_AddParmAtOffset(ts, OPT_mountdir, "-mountdir", CMD_SINGLE,
-		        CMD_OPTIONAL, "mount location");
+			CMD_OPTIONAL, "mount location");
     cmd_AddParmAtOffset(ts, OPT_daemons, "-daemons", CMD_SINGLE,
-		        CMD_OPTIONAL, "number of daemons to use");
+			CMD_OPTIONAL, "number of daemons to use");
     cmd_AddParmAtOffset(ts, OPT_nosettime, "-nosettime", CMD_FLAG,
-		        CMD_OPTIONAL, "don't set the time");
+			CMD_OPTIONAL, "don't set the time");
     cmd_AddParmAtOffset(ts, OPT_verbose, "-verbose", CMD_FLAG,
-		        CMD_OPTIONAL, "display lots of information");
+			CMD_OPTIONAL, "display lots of information");
     cmd_AddParmAtOffset(ts, OPT_rmtsys, "-rmtsys", CMD_FLAG,
-		        CMD_OPTIONAL, "start NFS rmtsysd program");
+			CMD_OPTIONAL, "start NFS rmtsysd program");
     cmd_AddParmAtOffset(ts, OPT_debug, "-debug", CMD_FLAG,
 			CMD_OPTIONAL, "display debug info");
     cmd_AddParmAtOffset(ts, OPT_chunksize, "-chunksize", CMD_SINGLE,
-		        CMD_OPTIONAL, "log(2) of chunk size");
+			CMD_OPTIONAL, "log(2) of chunk size");
     cmd_AddParmAtOffset(ts, OPT_dcache, "-dcache", CMD_SINGLE,
-		        CMD_OPTIONAL, "number of dcache entries");
+			CMD_OPTIONAL, "number of dcache entries");
     cmd_AddParmAtOffset(ts, OPT_volumes, "-volumes", CMD_SINGLE,
-		        CMD_OPTIONAL, "number of volume entries");
+			CMD_OPTIONAL, "number of volume entries");
     cmd_AddParmAtOffset(ts, OPT_biods, "-biods", CMD_SINGLE,
-		        CMD_OPTIONAL, "number of bkg I/O daemons (aix vm)");
+			CMD_OPTIONAL, "number of bkg I/O daemons (aix vm)");
     cmd_AddParmAtOffset(ts, OPT_prealloc, "-prealloc", CMD_SINGLE,
-		        CMD_OPTIONAL, "number of 'small' preallocated blocks");
+			CMD_OPTIONAL, "number of 'small' preallocated blocks");
     cmd_AddParmAtOffset(ts, OPT_confdir, "-confdir", CMD_SINGLE,
 			CMD_OPTIONAL, "configuration directory");
     cmd_AddParmAtOffset(ts, OPT_logfile, "-logfile", CMD_SINGLE,
-		        CMD_OPTIONAL, "Place to keep the CM log");
+			CMD_OPTIONAL, "Place to keep the CM log");
     cmd_AddParmAtOffset(ts, OPT_waitclose, "-waitclose", CMD_FLAG,
-		        CMD_OPTIONAL, "make close calls synchronous");
+			CMD_OPTIONAL, "make close calls synchronous");
     cmd_AddParmAtOffset(ts, OPT_shutdown, "-shutdown", CMD_FLAG,
-		        CMD_OPTIONAL, "Shutdown all afs state");
+			CMD_OPTIONAL, "Shutdown all afs state");
     cmd_AddParmAtOffset(ts, OPT_peerstats, "-enable_peer_stats", CMD_FLAG,
 			CMD_OPTIONAL, "Collect rpc statistics by peer");
     cmd_AddParmAtOffset(ts, OPT_processstats, "-enable_process_stats",
-		        CMD_FLAG, CMD_OPTIONAL, "Collect rpc statistics for this process");
+			CMD_FLAG, CMD_OPTIONAL, "Collect rpc statistics for this process");
     cmd_AddParmAtOffset(ts, OPT_memallocsleep, "-mem_alloc_sleep",
 			CMD_FLAG, CMD_OPTIONAL | CMD_HIDE,
 			"Allow sleeps when allocating memory cache");
     cmd_AddParmAtOffset(ts, OPT_afsdb, "-afsdb", CMD_FLAG,
-		        CMD_OPTIONAL, "Enable AFSDB support");
+			CMD_OPTIONAL, "Enable AFSDB support");
     cmd_AddParmAtOffset(ts, OPT_filesdir, "-files_per_subdir", CMD_SINGLE,
 			CMD_OPTIONAL,
-		        "log(2) of the number of cache files per "
+			"log(2) of the number of cache files per "
 			"cache subdirectory");
     cmd_AddParmAtOffset(ts, OPT_dynroot, "-dynroot", CMD_FLAG,
-		        CMD_OPTIONAL, "Enable dynroot support");
+			CMD_OPTIONAL, "Enable dynroot support");
     cmd_AddParmAtOffset(ts, OPT_fakestat, "-fakestat", CMD_FLAG,
-		        CMD_OPTIONAL,
+			CMD_OPTIONAL,
 			"Enable fakestat support for cross-cell mounts");
     cmd_AddParmAtOffset(ts, OPT_fakestatall, "-fakestat-all", CMD_FLAG,
-		        CMD_OPTIONAL,
+			CMD_OPTIONAL,
 			"Enable fakestat support for all mounts");
     cmd_AddParmAtOffset(ts, OPT_nomount, "-nomount", CMD_FLAG,
-		        CMD_OPTIONAL, "Do not mount AFS");
+			CMD_OPTIONAL, "Do not mount AFS");
     cmd_AddParmAtOffset(ts, OPT_backuptree, "-backuptree", CMD_FLAG,
-		        CMD_OPTIONAL,
+			CMD_OPTIONAL,
 			"Prefer backup volumes for mountpoints in backup "
 			"volumes");
     cmd_AddParmAtOffset(ts, OPT_rxbind, "-rxbind", CMD_FLAG,

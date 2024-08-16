@@ -342,12 +342,12 @@ afsd_call_syscall(struct afsd_syscall_args *args)
     if (afsd_debug) {
 	char *opcode;
 	char buffer[32];
-        const char *syscall_str;
+	const char *syscall_str;
 
 #if defined(AFS_SYSCALL)
 	syscall_str = opr_stringize(AFS_SYSCALL);
 #else
-        syscall_str = "[AFS_SYSCALL]";
+	syscall_str = "[AFS_SYSCALL]";
 #endif
 
 	if ((args->syscall < 0) ||
@@ -467,10 +467,10 @@ aix_vmount(const char *cacheMountDir)
 }
 #endif /* AFS_AIX_ENV */
 
-#ifdef	AFS_HPUX_ENV
-#define	MOUNTED_TABLE	MNT_MNTTAB
+#ifdef AFS_HPUX_ENV
+#define MOUNTED_TABLE MNT_MNTTAB
 #else
-#define	MOUNTED_TABLE	MOUNTED
+#define MOUNTED_TABLE MOUNTED
 #endif
 
 static int
@@ -564,12 +564,12 @@ afsd_mount_afs(const char *rn, const char *cacheMountDir)
     char *mountDir; /* For HandleMTab() */
 
     mountFlags = 0;		/* Read/write file system, can do setuid() */
-#if	defined(AFS_SUN_ENV) || defined(AFS_SUN5_ENV)
-#ifdef	AFS_SUN5_ENV
+#if defined(AFS_SUN_ENV) || defined(AFS_SUN5_ENV)
+# ifdef AFS_SUN5_ENV
     mountFlags |= MS_DATA;
-#else
+# else
     mountFlags |= M_NEWTYPE;	/* This searches by name in vfs_conf.c so don't need to recompile vfs.c because MOUNT_MAXTYPE has changed; it seems that Sun fixed this at last... */
-#endif
+# endif
 #endif
 
 #if defined(AFS_HPUX100_ENV)
