@@ -59,9 +59,9 @@ running kernel to the most current version and reboot if needed before
 installing the `kernel-devel` package.
 
 Install the kernel development package with the command.
-
+    ```
     $ yum install "kernel-devel-uname-r==$(uname -r)"
-
+    ```
 
 ### Debian
 
@@ -154,36 +154,36 @@ series.
    something like git or git-core.  Otherwise, go to http://git-scm.com/
 
 2. Run the command:
-
+    ```
     $ git clone git://git.openafs.org/openafs.git
-
+    ```
    This will download the full repository and leave a checked-out tree in
    a subdirectory of the current directory named openafs.
 
 3. Generate the additional required files:
-
+    ```
     $ cd openafs
     $ ./regen.sh
-
+    ```
 ## Building
 
 Run `configure` with the desired options.
-
-   $ ./configure --enable-checking
-
+    ```
+    $ ./configure --enable-checking
+    ```
 To see the available configure options, run `./configure --help`.
 
 Run `make` to build the full tree:
-
+    ```
     $ make
-
+    ```
 Run the included unit tests:
-
+    ```
     $ make check
-
+    ```
 Create an installation tree with `make`.
-
+    ```
     $ make install DESTDIR=<path-to-staging-directory>
-
+    ```
 Where `<path-to-staging-directory>` is a directory to stage the installation,
 such as `/tmp/openafs`.

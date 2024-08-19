@@ -122,7 +122,7 @@ used across multiple source files.
 All routines should be declared static if they are not used outside that source
 file.
 
-Compiles on gcc-using machines should strive to handle using
+Compilation on gcc-using machines should strive to handle using
 `-Wstrict-prototypes -Werror` (this may take a while).
 
 Routines shall be defined in source prior to use if possible; if a static
@@ -181,6 +181,8 @@ Instead of:
 
     if (some_condition)
         do_some_action();
+    else
+        do_something_else();
 
     while (some_condition)
         do_something();
@@ -214,7 +216,7 @@ Use:
     switch (x) {
     case 1:
         do_something();
-	break;
+        break;
     case 2:
         do_something_else();
         AFS_FALLTHROUGH;
@@ -227,7 +229,7 @@ Instead of using fallthrough comments:
     switch (x) {
     case 1:
         do_something();
-	break;
+        break;
     case 2:
         do_something_else();
         /* fallthrough */
@@ -261,11 +263,11 @@ Use:
     int
     func(void)
     {
-	if (code != 0) {
-	    goto done;
-	}
+        if (code != 0) {
+            goto done;
+        }
      done:
-	return code;
+        return code;
     }
 
 Instead of:
@@ -273,11 +275,11 @@ Instead of:
     int
     func(void)
     {
-	if (code != 0) {
-	    goto done;
-	}
+        if (code != 0) {
+            goto done;
+        }
     done:
-	return code;
+        return code;
     }
 
 ## Comparisons
@@ -290,20 +292,20 @@ Use:
 
     int var, *ptr;
     if (var != 0) {
-	use_var();
+        use_var();
     }
     if (ptr == NULL) {
-	no_ptr();
+        no_ptr();
     }
 
 Instead of:
 
     int var, *ptr;
     if (var) {
-	use_var();
+        use_var();
     }
     if (!ptr) {
-	no_ptr();
+        no_ptr();
     }
 
 If a value is of type `int` but actually represents a boolean value, then use
@@ -311,10 +313,10 @@ the value directly. For example:
 
     int foo_exists = 0;
     if (result == 0) {
-	foo_exists = 1;
+        foo_exists = 1;
     }
     if (foo_exists) {
-	use_foo();
+        use_foo();
     }
 
 This helps make it immediately obvious when reading a section of code whether a
